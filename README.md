@@ -266,3 +266,14 @@ docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  youyu/
 
 You have to use "-v" to mount your local data directory into the container.
 Check Docker doc for more detailed information.
+
+### Develop ORB-SLAM2 with Ubuntu build image
+
+You can develop and compile ORB-SLAM2 with a pre-build Ubuntu 16.04 image, with all 3rd-party dependencies resolved already.
+
+```
+docker run -it --rm -v $(pwd):/ORM_SLAM2 youyu/ubuntu:16.04
+cd /ORB_SLAM2
+./build.sh
+
+```
