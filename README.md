@@ -261,7 +261,7 @@ docker pull youyu/orb_slam2:latest
 You have to run the Docker image under the GUI (X) environment.
 
 ```
-docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  youyu/orb-slam2:latest
+docker run -it --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix  youyu/orb_slam2:latest
 ```
 
 You have to use "-v" to mount your local data directory into the container.
