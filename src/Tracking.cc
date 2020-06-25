@@ -1560,6 +1560,8 @@ bool Tracking::Relocalization()
 
     if(!bMatch)
     {
+        // see https://github.com/raulmur/ORB_SLAM2/pull/381/commits/faaf7ec64aafedabe28436b08d034387184d20e0
+        mCurrentFrame.mTcw = cv::Mat::zeros(0, 0, CV_32F); // set mTcw back to empty if relocation is failed
         return false;
     }
     else

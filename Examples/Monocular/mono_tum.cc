@@ -29,6 +29,7 @@
 #include<System.h>
 
 using namespace std;
+using namespace cv;
 
 void LoadImages(const string &strFile, vector<string> &vstrImageFilenames,
                 vector<double> &vTimestamps);
@@ -65,7 +66,7 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
-        im = cv::imread(string(argv[3])+"/"+vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
+        im = cv::imread(string(argv[3])+"/"+vstrImageFilenames[ni],IMREAD_UNCHANGED);
         double tframe = vTimestamps[ni];
 
         if(im.empty())
