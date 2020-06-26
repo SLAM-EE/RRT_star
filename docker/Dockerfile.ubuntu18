@@ -1,9 +1,9 @@
 FROM borda/docker_python-opencv-ffmpeg:py3.6
-MAINTAINER Yu You <youyu.youyu@gmail.com>
+LABEL maintainer="Yu You <youyu.youyu@gmail.com>"
 
 # Get dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		cmake build-essential pkg-config \
+		cmake build-essential pkg-config python3-dev \
 		libglew-dev libeigen3-dev libomp-dev \
 		libboost-dev libboost-thread-dev libboost-filesystem-dev \
 		libboost-python1.65-dev libboost-serialization-dev \
