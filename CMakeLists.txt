@@ -43,7 +43,7 @@ find_package(Boost  1.54.0  	     # Minimum or EXACT version e.g. 1.36.0
   COMPONENTS python serialization 				# Boost libraries by their canonical name
   )
 
-find_package(PythonLibs 3.8 REQUIRED)
+find_package(PythonLibs 3 REQUIRED)
 
 include_directories(
 ${Boost_INCLUDE_DIRS}
