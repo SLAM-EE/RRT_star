@@ -3,6 +3,7 @@
 
 **Note:** This is a modified version of original [ORB_SLAM2](https://github.com/raulmur/ORB_SLAM2) and features implemented by [Mathew Denny](https://github.com/MathewDenny/ORB_SLAM2) and fixed by [Hangqiu](https://github.com/hangqiu/ORB_SLAM2); binary vocabulary loading from [Poine](https://github.com/poine/ORB_SLAM2). Other good features from other contributors will be merged soon.
 
+**26 June 2020**: OpenCV 4.2.0 and Eigen 3 are supported (see the dockerfile).
 
 **13 Jan 2017**: OpenCV 3 and Eigen 3.3 are now supported.
 
