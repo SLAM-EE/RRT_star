@@ -20,7 +20,7 @@ RUN cd /tmp && wget https://dl.bintray.com/boostorg/release/1.73.0/source/boost_
 	&& bash bootstrap.sh --with-python=python3 \
 	&& ./b2 && ./b2 install \
 	&& cd / && rm -rf /tmp/boost_1_73_0*
-	
+
 # Pangolin
 RUN cd /tmp && git clone https://github.com/stevenlovegrove/Pangolin.git \
 	&& cd Pangolin && mkdir build && cd build && cmake .. \
@@ -33,3 +33,8 @@ RUN git clone https://github.com/yuyou/ORB_SLAM2.git
 
 RUN cd ORB_SLAM2 && bash build.sh
 
+RUN cp /ORB_SLAM2/Thirdparty/DBoW2/lib/libDBoW2.so /usr/local/lib/ \
+	&& cp /ORB_SLAM2/Thirdparty/g2o/lib/libg2o.so /usr/local/lib/ \
+	&& ldconfig
+
+	
