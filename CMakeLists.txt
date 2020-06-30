@@ -44,6 +44,7 @@ find_package(Boost  1.54.0  	     # Minimum or EXACT version e.g. 1.36.0
   )
 
 find_package(PythonLibs 3 REQUIRED)
+#find_package (Python3)
 
 include_directories(
 ${Boost_INCLUDE_DIRS}
@@ -159,7 +160,8 @@ install(TARGETS ${PROJECT_NAME}
 #    "${CMAKE_INSTALL_PREFIX}/lib/python2.7/${PYTHON_SITE_PACKAGES}"
 #    CACHE PATH "Path where to install SLAM")
 
-set(PYTHON_INSTALL_DIR "/usr/lib/python2.7/" CACHE PATH "")
+#set(PYTHON_INSTALL_DIR "/usr/lib/python2.7/" CACHE PATH "")
+set(PYTHON_INSTALL_DIR "/usr/lib/python3/dist-packages" CACHE PATH "")
 install(TARGETS SLAM DESTINATION "${PYTHON_INSTALL_DIR}")
 
 install(DIRECTORY include/ DESTINATION include)

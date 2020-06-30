@@ -92,6 +92,17 @@ chmod +x build.sh
 
 This will create **libORB_SLAM2.so**  at *lib* folder and the executables **mono_tum**, **mono_kitti**, **rgbd_tum**, **stereo_kitti**, **mono_euroc** and **stereo_euroc** in *Examples* folder.
 
+##3.1 Build for Mac OSX
+
+First instal GCC-9 (Homebrew GCC 9.3.0_1) from `brew`. Also `glew` is needed for Pangolin.
+
+```
+brew install gcc
+brew install glew
+bash build_osx.sh
+
+``` 
+
 #4. Monocular Examples
 
 ## TUM Dataset
