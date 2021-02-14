@@ -29,6 +29,7 @@
 #include<opencv2/core/core.hpp>
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/videoio.hpp>
 #include"System.h"
 
 using namespace std;
@@ -111,16 +112,13 @@ int main(int argc, char **argv)
 //        double tframe = std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
         
         // Pass the image to the SLAM system
-        end = std::chrono::system_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end - start;
-        cout << "passing ...."  << endl;
-        double t = 1 /60;
-        fakets += t;
+        //end = std::chrono::system_clock::now();
+        //std::chrono::duration<double> elapsed_seconds = end - start;
+        // cout << "passing ...."  << endl;
+        fakets = cap.get(cv::CAP_PROP_POS_MSEC) / 1000;
         SLAM.TrackMonocular(gray, fakets );
-        cout << "timestamp....... " << elapsed_seconds.count() << endl;
-        double T=60;
+        // cout << "timestamp....... " << fakets << "time_el" << elapsed_seconds.count() << endl;
 
-        usleep((T)*1e6);
 
     }
 
