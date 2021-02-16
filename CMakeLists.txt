@@ -129,6 +129,12 @@ add_executable(mono_euroc
 Examples/Monocular/mono_euroc.cc)
 target_link_libraries(mono_euroc ${PROJECT_NAME})
 
+
+add_executable(mono_rt
+Examples/Monocular/mono_rt.cc)
+target_link_libraries(mono_rt ${PROJECT_NAME})
+
+
 # Build tools
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/tools)
 add_executable(bin_vocabulary
