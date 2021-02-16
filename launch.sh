@@ -8,6 +8,7 @@ docker run --privileged -it \
 --volume="/home/$USER:/home/$USER" \
 --workdir="/home" \
 --volume="/home/$USER/xcode/magellan/dataset:/home/dataset" \
+--volume="/home/$USER/xcode/magellan/custom_datasets:/home/custom_dataset" \
 --volume="/home/$USER/xcode/magellan/ORB_SLAM2:/home/ORB_SLAM2" \
 --volume="/etc/group:/etc/group:ro" \
 --volume="/etc/passwd:/etc/passwd:ro" \
