@@ -1,6 +1,5 @@
 /**
 * This file is part of ORB-SLAM2.
-*
 * Copyright (C) 2014-2016 Raúl Mur-Artal <raulmur at unizar dot es> (University of Zaragoza)
 * For more information see <https://github.com/raulmur/ORB_SLAM2>
 *
@@ -66,7 +65,9 @@ int main(int argc, char **argv)
     // Using time point and system_clock 
     std::chrono::time_point<std::chrono::system_clock> start, end; 
 
-    cv::VideoCapture cap("bumpy.webm");
+    cout << ".........>>>>>........"  << argv[3] << endl;
+
+    cv::VideoCapture cap(argv[3]);
     if ( !cap.isOpened() )  // isOpened() returns true if capturing has been initialized.
     {
         cout << "Cannot open the video file. \n";
@@ -86,7 +87,11 @@ int main(int argc, char **argv)
     // WINDOW_OPENGL : The window will be created with OpenGL support.
 
     start = std::chrono::system_clock::now();
-    double fakets = 0;
+    double time_stamp = 0;
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE();
+    clahe->setClipLimit(4);
+    clahe->setTilesGridSize(Size(8,8));
+    cv::Mat dst;
     while(1)
     {
         cv::Mat frame;
@@ -100,6 +105,9 @@ int main(int argc, char **argv)
             break;
         }
         cvtColor(frame, gray, CV_BGR2GRAY);
+        clahe->apply(gray, dst);
+        // apply the CLAHE algorithm
+      //  cv::equalizeHist(gray, gray);
 
 
 
@@ -115,9 +123,9 @@ int main(int argc, char **argv)
         //end = std::chrono::system_clock::now();
         //std::chrono::duration<double> elapsed_seconds = end - start;
         // cout << "passing ...."  << endl;
-        fakets = cap.get(cv::CAP_PROP_POS_MSEC) / 1000;
-        SLAM.TrackMonocular(gray, fakets );
-        // cout << "timestamp....... " << fakets << "time_el" << elapsed_seconds.count() << endl;
+        time_stamp = cap.get(cv::CAP_PROP_POS_MSEC) / 1000;
+        SLAM.TrackMonocular(dst, time_stamp );
+        // cout << "timestamp....... " << time_stamp << "time_el" << elapsed_seconds.count() << endl;
 
 
     }
