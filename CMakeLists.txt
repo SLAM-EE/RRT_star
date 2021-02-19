@@ -129,10 +129,13 @@ add_executable(mono_euroc
 Examples/Monocular/mono_euroc.cc)
 target_link_libraries(mono_euroc ${PROJECT_NAME})
 
-
 add_executable(mono_rt
 Examples/Monocular/mono_rt.cc)
 target_link_libraries(mono_rt ${PROJECT_NAME})
+
+add_executable(mono_real_time
+Examples/Monocular/mono_real_time.cc)
+target_link_libraries(mono_real_time ${PROJECT_NAME})
 
 
 # Build tools
