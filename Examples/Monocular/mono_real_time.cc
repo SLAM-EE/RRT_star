@@ -34,6 +34,19 @@
 
 using namespace std;
 
+
+static volatile bool keep_running = true;
+
+   static void* userInput_thread(void*)
+   {
+       while(keep_running) {
+           if (std::cin.get() == 'q')
+           {
+               //! desired user input 'q' received
+               keep_running = false;
+           }
+       }
+   }
 //void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames, vector<double> &vTimestamps);
 
 int main(int argc, char **argv)
@@ -43,7 +56,13 @@ int main(int argc, char **argv)
         cerr << endl << "Usage: ./mono_real_time path_to_vocabulary path_to_settings" << endl;
         return 1;
     }
-
+	
+	pthread_t tId;
+    (void) pthread_create(&tId, 0, userInput_thread, 0);
+      
+	//count the number of image frames processed in real time
+	//int frame_count = 0;
+	
     // Retrieve paths to images
     //vector<string> vstrImageFilenames;
     //vector<double> vTimestamps;
@@ -63,13 +82,13 @@ int main(int argc, char **argv)
     //cout << "Images in the sequence: " << nImages << endl << endl;
 	
 	//open webcam video input
-	cv::VideoCapture cap(1); 
+	cv::VideoCapture cap(0); 
     if(!cap.isOpened())  
         return -1;
         
     // Main loop
     cv::Mat im;
-    for(;;)
+    while(keep_running)
     {
         // Read image from file
         //im = cv::imread(vstrImageFilenames[ni],CV_LOAD_IMAGE_UNCHANGED);
@@ -84,7 +103,10 @@ int main(int argc, char **argv)
             cerr << endl << "Failed to load image at " << endl;
             return 1;
         }
-
+		
+		//increment the count by one when a new image frame is loaded
+		//frame_count++;
+		
 #ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 #else
@@ -115,6 +137,14 @@ int main(int argc, char **argv)
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
         */
+        
+       	// Save camera trajectory
+       	/*
+        if((frame_count % 20) == 0)
+        {
+        	SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");    
+        }
+        */
     }
 
     // Stop all threads
@@ -134,7 +164,7 @@ int main(int argc, char **argv)
 	*/
     // Save camera trajectory
     SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");    
-
+	(void) pthread_join(tId, NULL);
     return 0;
 }
 
