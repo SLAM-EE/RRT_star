@@ -121,6 +121,15 @@ int main(int argc, char **argv)
 
     // Save camera trajectory
     SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");    
+    
+    /*-------------------saving maps to be used to build occupancy map- (abhineet)-*/
+   	// Save 3D points as obj file
+	SLAM.getMap()->Save("kitti_map_pts_out.obj");
+	// Save 3D points and timestamps of all keyframes they are visible in
+	SLAM.getMap()->SaveWithTimestamps("kitti_map_pts_and_keyframes.txt");
+	// Save camera trajectory
+	SLAM.SaveKeyFrameTrajectoryTUM("kitti_key_frame_trajectory.txt");
+
 
     return 0;
 }

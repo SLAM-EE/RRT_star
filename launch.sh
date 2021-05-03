@@ -6,7 +6,7 @@ docker run --privileged -it \
 --env="QT_X11_NO_MITSHM=1"  \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 --volume="/home/$USER:/home/$USER" \
---workdir="/home" \
+--workdir="/home/ORB_SLAM2" \
 --volume="/home/$USER/xcode/magellan/dataset:/home/dataset" \
 --volume="/home/$USER/xcode/magellan/custom_datasets:/home/custom_dataset" \
 --volume="/home/$USER/xcode/magellan/ORB_SLAM2:/home/ORB_SLAM2" \
@@ -20,7 +20,6 @@ docker run --privileged -it \
 -e LOCAL_USER_ID=`id -u $USER` \
 -e LOCAL_GROUP_ID=`id -g $USER` \
 -e LOCAL_GROUP_NAME=`id -gn $USER` \
-   youyu/orb_slam2:ubuntu18
-
+    magellan_opencv
 
 xhost -local:root
