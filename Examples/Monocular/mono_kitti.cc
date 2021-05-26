@@ -28,9 +28,12 @@
 #include<opencv2/core/core.hpp>
 
 #include"System.h"
+#include "Map2D.h"
 
 using namespace std;
 using namespace cv;
+
+std::thread* tMap2D;
 
 void LoadImages(const string &strSequence, vector<string> &vstrImageFilenames,
                 vector<double> &vTimestamps);
@@ -42,6 +45,7 @@ int main(int argc, char **argv)
         cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence" << endl;
         return 1;
     }
+    int i =0;
 
     // Retrieve paths to images
     vector<string> vstrImageFilenames;
@@ -60,6 +64,9 @@ int main(int argc, char **argv)
     cout << endl << "-------" << endl;
     cout << "Start processing sequence ..." << endl;
     cout << "Images in the sequence: " << nImages << endl << endl;
+
+    ORB_SLAM2::Map2D mpMap2D;
+    tMap2D = new std::thread(&ORB_SLAM2::Map2D::Run, &mpMap2D);
 
     // Main loop
     cv::Mat im;
@@ -103,6 +110,13 @@ int main(int argc, char **argv)
 
         if(ttrack<T)
             usleep((T-ttrack)*1e6);
+
+        //cout << ni << "frame number" << endl;
+        if(ni % 100 == 0 && ni >2){
+            mpMap2D.setNewKeyFrames(SLAM.getMap()->GetAllKeyFrames());
+            mpMap2D.cv.notify_one();
+        }
+        
     }
 
     // Stop all threads
