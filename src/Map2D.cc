@@ -1,21 +1,4 @@
 /**
-* This file is part of ORB-SLAM2.
-*
-* Copyright (C) 2014-2016 Raúl Mur-Artal <raulmur at unizar dot es> (University of Zaragoza)
-* For more information see <https://github.com/raulmur/ORB_SLAM2>
-*
-* ORB-SLAM2 is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* ORB-SLAM2 is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with ORB-SLAM2. If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "Map2D.h"
@@ -54,8 +37,8 @@ namespace ORB_SLAM2
       	h = grid_res_z;
         w = grid_res_x;
 
-        global_occupied_counter.create(h, w, CV_8U);
-        global_visit_counter.create(h, w, CV_8U);
+        global_occupied_counter.create(h, w, CV_32SC1);
+        global_visit_counter.create(h, w, CV_32SC1);
         grid_map.create(h, w, CV_32FC1);
 	    grid_map_thresh.create(h, w, CV_8UC1);
 	    grid_map_thresh_resized.create(h*resize_factor, w*resize_factor, CV_8UC1);
@@ -162,6 +145,7 @@ namespace ORB_SLAM2
 
         }//loop on keyframes;
         cout << "No of keyframes processed :" << points << endl;
+        cout << "height :" << h << " width :" << w << endl;
 
     }
 

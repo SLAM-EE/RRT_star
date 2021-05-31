@@ -50,12 +50,12 @@ public:
 
     int points=0;
    // parameters
-    float scale_factor = 20;
+    float scale_factor = 10;
     float resize_factor = 1;
     float cloud_max_x = 100;
     float cloud_min_x = -100.0;
-    float cloud_max_z = 160;
-    float cloud_min_z = -5;
+    float cloud_max_z = 100;
+    float cloud_min_z = -100;
     float free_thresh = 0.55;
     float occupied_thresh = 0.50;
     float thresh_diff = 0.01;
