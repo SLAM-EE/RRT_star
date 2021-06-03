@@ -2,6 +2,7 @@
 */
 
 #include "Map2D.h"
+#include <opencv2/core/hal/interface.h>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
 #include <pangolin/pangolin.h>
@@ -24,6 +25,7 @@ namespace ORB_SLAM2
     }
     void Map2D::Run()
     {
+        //Main method
 
         cv::Mat im = cv::imread("/home/dataset/testImage.jpeg", cv::IMREAD_GRAYSCALE);
       	grid_max_x = cloud_max_x*scale_factor;
@@ -56,11 +58,7 @@ namespace ORB_SLAM2
              
             std::unique_lock<std::mutex> lk(mutexStart);
             cv.wait(lk);
-           // std::cout << "Mapper Triggered" << endl;
-           // cv::namedWindow("mpac");
-           // cv::imshow("mpac", im);
-           // cv::waitKey(0);
-           // cv::destroyWindow("mpac");
+            std::cout << "Mapper Triggered" << endl;
             resetGridMap();
             getGridMap();
             std::cout << "Map Processed" << endl;
@@ -177,10 +175,32 @@ namespace ORB_SLAM2
 	cv::resize(grid_map_thresh, grid_map_thresh_resized, grid_map_thresh_resized.size());
    	//cv::imshow("grid_map_thresh_resized", grid_map_thresh_resized);
     	//int key = cv::waitKey(1) % 256;
-    std::cout << "image height:" << grid_map_thresh_resized.rows << std::endl;
-    std::cout << "image width:" << grid_map_thresh_resized.cols << std::endl;
-   	printf("saving maps with id: %u\n", frame_count);
-	cv::imwrite("results/grid_map_" + to_string(frame_count) + ".jpg", grid_map_thresh);
+    //std::cout << "image height:" << grid_map_thresh_resized.rows << std::endl;
+    //std::cout << "image width:" << grid_map_thresh_resized.cols << std::endl;
+   	//printf("saving maps with id: %u\n", frame_count);
+    cv::Mat mask = (grid_map < 0.48);
+    grid_map.setTo(0.48, mask);
+    cv::Mat mask2 = grid_map > 0.6;
+    grid_map.setTo(0.6, mask2);
+    float Amin = *min_element(grid_map.begin<float>(), grid_map.end<float>());
+    float Amax = *max_element(grid_map.begin<float>(), grid_map.end<float>());
+    cv::Mat display;
+    cv::Mat A_scaled = cv::Mat(h, w, CV_32FC1);
+    A_scaled = (grid_map - Amin) /(Amax - Amin);
+    //A_scaled = (grid_map - 0.48) /(0.6 - 0.48);
+    
+    //int nHistSize = 512;
+    //float fRange[] = { 0.0f, 1.0f };
+    //const float* fHistRange = { fRange };
+    //
+    //cv::Mat matHist;
+    //cv::calcHist(&A_scaled, 1, 0, cv::Mat(), matHist, 1, &nHistSize, &fHistRange);
+
+    //cv::imshow("histogram", matHist);
+    A_scaled.convertTo(display, CV_8UC1, 255.0, 0); 
+    cv::applyColorMap(display, display, cv::COLORMAP_JET);
+    cv::imshow("map 2D", display);
+    cv::imwrite("results/grid_map_" + to_string(frame_count) + ".jpg", grid_map_thresh);
     inc_frame();
 
 

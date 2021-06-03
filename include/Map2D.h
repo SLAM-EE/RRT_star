@@ -52,10 +52,10 @@ public:
    // parameters
     float scale_factor = 10;
     float resize_factor = 1;
-    float cloud_max_x = 100;
-    float cloud_min_x = -100.0;
-    float cloud_max_z = 100;
-    float cloud_min_z = -100;
+    float cloud_max_x = 50;
+    float cloud_min_x = -50.0;
+    float cloud_max_z = 50;
+    float cloud_min_z = -10;
     float free_thresh = 0.55;
     float occupied_thresh = 0.50;
     float thresh_diff = 0.01;
