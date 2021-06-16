@@ -1,8 +1,13 @@
 
 #include <iostream>
+#include <limits>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h> 
 #include <math.h>
+#include <bits/stdc++.h>
+#include <limits>
+#include <opencv2/opencv.hpp>
+
 #define xmax 100
 #define ymax 100
 
@@ -137,9 +142,22 @@ void line(int x1,int y1,int x2,int y2,int obs[][xmax])
 }
 int main()
 {
+    cv::Mat img = cv::imread("../img/image.jpg", cv::IMREAD_COLOR);
+    if(img.empty())
+    {
+        std::cout << "Could not read the image: " <<  std::endl;
+        return 1;
+    }
+    cv::imshow("Display window", img);
+    int k = cv::waitKey(0); // Wait for a keystroke in the window
+    if(k == 's')
+    {
+        cv::imwrite("starry_night.png", img);
+    }
+
     srand (time(NULL));
     Node n[numNodes];
-    n[0].generate_node(0,0,9999999,0);//x,y,parent,cost
+    n[0].generate_node(0,0,INT_MAX,0);//x,y,parent,cost
     N_++;
     int goal_x=xmax-1;
     int goal_y=ymax-1;
@@ -153,24 +171,19 @@ int main()
         int y_rand=rand()%ymax;//0 to ymax-1
         
         int idx; 
-        int val=999999;
+        float min_dist=std::numeric_limits<float>::max();
         int global_count=0;//for ndist
         //skipped that  for
         
         float ndist[numNodes]={0};
-        
         for(int j=0;j<N_;j++)
         {
             float tmp=dist(n[j].x_cord,n[j].y_cord,x_rand,y_rand);
             ndist[global_count]=tmp;
             global_count++;//keep track of the array's useful size
-        }
-        for (int j=0;j<global_count;j++)//now val and idx contain min dist and the corresponding index
-        {
-            if(ndist[j]<val)
-            {
-                val=ndist[j];
-                idx=j;
+            if(tmp < min_dist){
+                min_dist = tmp;
+                idx = j;
             }
         }
         //cout<<" value"<<val<<" idx"<<idx<<endl;
@@ -179,7 +192,7 @@ int main()
         //qnew_x & qnew_y----->q_new.cord
         int qnew_x,qnew_y,qnew_parent;
         float qnew_cost;
-        steer(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,val,EPS,&qnew_x,&qnew_y);
+        steer(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,min_dist,EPS,&qnew_x,&qnew_y);
         if (no_collision(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,obstacles))//To defined
         {
         //line drawn between qnear and qnew_y-dotted
