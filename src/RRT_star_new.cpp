@@ -140,8 +140,70 @@ void line(int x1,int y1,int x2,int y2,int obs[][xmax])
         }
     } 
 }
+
+
+void DrawBresenhamline(int x0, int y0, int x1, int y1)
+{
+  cv::Mat im(100,100,CV_8UC3, cv::Scalar(255,255,255));
+  int dx = x1 - x0; // x offset
+     int dy = y1 - y0; // y offset
+     int ux = dx >0 ?1:-1;//x stretching direction
+     int uy = dy >0 ?1:-1;//y stretching direction
+  dx = abs(dx);
+  dy = abs(dy);
+     int dx2 = dx <<1; // x offset multiplied by 2
+     int dy2 = dy <<1;//y offset multiplied by 2
+  if(dx > dy)
+         {// Calculated in x increments
+             int e = -dx; //e = -0.5 * 2 * dx, replace e with 2 * dx* e
+             int x = x0; // starting point x coordinate
+             int y = y0; // starting point y coordinate
+
+      for (x = x0; x != x1;x+=ux)
+        {
+          printf ("%d,%d\n",x, y);
+          im.at<cv::Vec3b>(x,y) = cv::Vec3b(255,0,0);
+                     e= e + dy2;//From 2*e*dx= 2*e*dx + 2dy (originally e = e + k)
+                     if (e > 0) // e is an integer and greater than 0 means to take the upper right point (otherwise the lower right point)
+            {
+              y += uy;
+                             e= e - dx2;//2*e*dx = 2*e*dx - 2*dx (originally e = e -1)
+            }
+        }
+
+
+    }
+  else
+         {// Calculated in y increments
+             int e = -dy; //e = -0.5 * 2 * dy, replace e with 2 * dy* e
+             int x = x0; // starting point x coordinate
+             int y = y0; // starting point y coordinate
+      for (y = y0; y != y1; y += uy)
+        {
+          printf ("%d,%d\n",x, y);
+          im.at<cv::Vec3b>(x,y) = cv::Vec3b(255,0,0);
+                     e=e + dx2;//From 2*e*dy= 2*e*dy + 2dy (originally e = e + k)
+                     if (e > 0) // e is an integer and greater than 0 means to take the upper right point (otherwise the lower right point)
+            {
+              x += ux;
+                             e= e - dy2;//2*e*dy = 2*e*dy - 2*dy (originally e = e -1)
+            }
+        }
+
+    }
+  printf("%d, %d\n",x1,y1);
+  im.at<cv::Vec3b>(x1,y1) = cv::Vec3b(255,0,0);
+  cv::imshow("dd",im);
+
+}
+
+
 int main()
 {
+
+    DrawBresenhamline(80,0,0,20);
+
+  cv::waitKey(0);
     cv::Mat img = cv::imread("../img/image.jpg", cv::IMREAD_COLOR);
     if(img.empty())
     {
