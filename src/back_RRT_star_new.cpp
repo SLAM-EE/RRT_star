@@ -1,4 +1,4 @@
-#include <cstdint>
+
 #include <iostream>
 #include <limits>
 #include <stdlib.h>     /* srand, rand */
@@ -7,14 +7,15 @@
 #include <bits/stdc++.h>
 #include <limits>
 #include <opencv2/opencv.hpp>
-#define xmax 1000
-#define ymax 1000
+
+#define xmax 100
+#define ymax 100
 
 using namespace std;
 
-int EPS=20,numNodes=10000;
+int EPS=30,numNodes=10000;
 int lamb=3.5;
-float r=50;//radius
+float r=24;//radius
 int N_=0;
 class Node
 {
@@ -51,7 +52,7 @@ class Node
   
 };
 
-/*void create_obstacle(int A[][xmax])
+void create_obstacle(int A[][xmax])
 {
     for(int i=0;i<ymax;i++)
     {
@@ -64,8 +65,8 @@ class Node
             }
         }
     }
-}*/
-/*void display_obstacles(int A[][xmax])
+}
+void display_obstacles(int A[][xmax])
 {
     for(int i=0;i<ymax;i++)
     {
@@ -75,7 +76,7 @@ class Node
         }
         cout<<endl;
     }
-}*/
+}
 float dist(int x1,int y1,int x2,int y2)
 {
     return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
@@ -94,91 +95,33 @@ void steer(int xr,int yr,int xn,int yn,float val,int EPS,int * new_x,int * new_y
                         *new_y=yr;
     //}
 }
-void swap(int * a,int * b)
+int no_collision(int x1,int y1,int x2,int y2,int obstacles[][xmax])
 {
-int temp=*a;
-*a=*b;
-*b=temp;
-}
-int no_collision(int x0,int y0,int x1,int y1,cv::Mat MAP)
-{
-
-int steep=(abs(y1-y0)>abs(x1-x0))?1:0;
-if (steep)
-{
-swap(&x0,&y0);
-swap(&x1,&y1);
-}
-if(x0>x1)
-{
-swap(&x0,&x1);
-swap(&y0,&y1);
-}
-int dErr=abs(y1-y0);
-int yStep=y0>y1?-1:1;
-int dX=x1-x0;
-int err=dX>>1;
-int y=y0;
-for(int x=x0;x<=x1;x++)
-{
-	if(steep)
-	
-	{
-//	cout<<MAP.at<int>(x,y)<<endl;
-	if(MAP.at<int>(x,y)>128)//i made 
-	
-	
-		return 0;}
-else
-	{
-
-//        cout<<MAP.at<int>(x,y)<<endl;
-        if(MAP.at<int>(y,x)>128)//i made
-        
-		return 0;}
-err-=dErr;
-if(err<0){
-y+=yStep;
-err+=dX;
-}
-}
-return 1;
+    int max_x,max_y,min_x,min_y;
+    max_x=(x1>x2)?x1:x2;
+    max_y=(y1>y2)?y1:y2;
+    min_x=(x1>x2)?x2:x1;
+    min_y=(y1>y2)?y2:y1;
+    float slope=(y2-y1)/((x2-x1)+0.0000001);
+    for(int i=min_x;i<=max_x;i++)
+    {
+        for(int j=min_y;j<=max_y;j++)
+        {
+             if (((j-slope*(i-x2)-y2)<=lamb)&&((j-slope*(i-x2)-y2)>=(-1*lamb)))
+            {
+               
+            if (obstacles[j][i]==1||obstacles[j][i]==2)
+            {
+                return 0;
+            }
+            }
+        }
+    }
+    return 1;//no obstacles
     
     
 }
-
-void bline(int x0,int y0,int x1,int y1,cv::Mat MAP)
-{
-int steep=(abs(y1-y0)>abs(x1-x0))?1:0;
-if (steep)
-{
-swap(&x0,&y0);
-swap(&x1,&y1);
-}
-if(x0>x1)
-{
-swap(&x0,&x1);
-swap(&y0,&y1);
-}
-int dErr=abs(y1-y0);
-int yStep=y0>y1?-1:1;
-int dX=x1-x0;
-int err=dX>>1;
-int y=y0;
-for(int x=x0;x<=x1;x++){
-if(steep)
-	MAP.at<int>(x,y)==0;//x&y swap??
-else
-	MAP.at<int>(y,x)==0;
-err-=dErr;
-if(err<0){
-y+=yStep;
-err+=dX;
-}
-}
-
-}
-/*void line(int x1,int y1,int x2,int y2,int obs[][xmax])
+void line(int x1,int y1,int x2,int y2,int obs[][xmax])
 {
    int max_x,max_y,min_x,min_y;
     max_x=(x1>x2)?x1:x2;
@@ -196,53 +139,105 @@ err+=dX;
             }
         }
     } 
-}*/
+}
+
+
+void DrawBresenhamline(int x0, int y0, int x1, int y1)
+{
+  cv::Mat im(100,100,CV_8UC3, cv::Scalar(255,255,255));
+  int dx = x1 - x0; // x offset
+     int dy = y1 - y0; // y offset
+     int ux = dx >0 ?1:-1;//x stretching direction
+     int uy = dy >0 ?1:-1;//y stretching direction
+  dx = abs(dx);
+  dy = abs(dy);
+     int dx2 = dx <<1; // x offset multiplied by 2
+     int dy2 = dy <<1;//y offset multiplied by 2
+  if(dx > dy)
+         {// Calculated in x increments
+             int e = -dx; //e = -0.5 * 2 * dx, replace e with 2 * dx* e
+             int x = x0; // starting point x coordinate
+             int y = y0; // starting point y coordinate
+
+      for (x = x0; x != x1;x+=ux)
+        {
+          printf ("%d,%d\n",x, y);
+          im.at<cv::Vec3b>(x,y) = cv::Vec3b(255,0,0);
+                     e= e + dy2;//From 2*e*dx= 2*e*dx + 2dy (originally e = e + k)
+                     if (e > 0) // e is an integer and greater than 0 means to take the upper right point (otherwise the lower right point)
+            {
+              y += uy;
+                             e= e - dx2;//2*e*dx = 2*e*dx - 2*dx (originally e = e -1)
+            }
+        }
+
+
+    }
+  else
+         {// Calculated in y increments
+             int e = -dy; //e = -0.5 * 2 * dy, replace e with 2 * dy* e
+             int x = x0; // starting point x coordinate
+             int y = y0; // starting point y coordinate
+      for (y = y0; y != y1; y += uy)
+        {
+          printf ("%d,%d\n",x, y);
+          im.at<cv::Vec3b>(x,y) = cv::Vec3b(255,0,0);
+                     e=e + dx2;//From 2*e*dy= 2*e*dy + 2dy (originally e = e + k)
+                     if (e > 0) // e is an integer and greater than 0 means to take the upper right point (otherwise the lower right point)
+            {
+              x += ux;
+                             e= e - dy2;//2*e*dy = 2*e*dy - 2*dy (originally e = e -1)
+            }
+        }
+
+    }
+  printf("%d, %d\n",x1,y1);
+  im.at<cv::Vec3b>(x1,y1) = cv::Vec3b(255,0,0);
+  cv::imshow("dd",im);
+
+}
+
+
 int main()
 {
-    cv::Mat img = cv::imread("../img/map_basic.png", cv::IMREAD_GRAYSCALE);
-    cv::Mat imgout = cv::imread("../img/map_basic.png", cv::IMREAD_COLOR);
-    //cv::imshow("Display window", img);
-    // int k = cv::waitKey(0); // Wait for a keystroke in the window
-    //if(k == 'q')
-    //{
-    //    cv::destroyAllWindows();
-    //}
-    cv::Mat MAP;
-    MAP.create(1000,1000, CV_8UC1);
-    cv::threshold(img, MAP, 0, 255, cv::THRESH_OTSU);
-    for(int i = 0; i < 1000; i++){
-        for(int j = 0; j < 1000; j++){
-            cout << imgout.at<int>(i,j);
-        }cout << endl;
+
+    DrawBresenhamline(80,0,0,20);
+
+  cv::waitKey(0);
+    cv::Mat img = cv::imread("../img/image.jpg", cv::IMREAD_COLOR);
+    if(img.empty())
+    {
+        std::cout << "Could not read the image: " <<  std::endl;
+        return 1;
     }
-    //cv::imshow("Display window2", imgout);
-    // k = cv::waitKey(0); // Wait for a keystroke in the window
-    //if(k == 'q')
-    //{
-    //    cv::destroyAllWindows();
-    //}
+    cv::imshow("Display window", img);
+    int k = cv::waitKey(0); // Wait for a keystroke in the window
+    if(k == 's')
+    {
+        cv::imwrite("starry_night.png", img);
+    }
+
     srand (time(NULL));
     Node n[numNodes];
-    n[0].generate_node(200,200,INT_MAX,0);//x,y,parent,cost
+    n[0].generate_node(0,0,INT_MAX,0);//x,y,parent,cost
     N_++;
-    int goal_x=800;
-    int goal_y=200;
-    //int obstacles[ymax][xmax]={0};
-   // create_obstacle(obstacles);
-    //display_obstacles(obstacles);//till here working
+    int goal_x=xmax-1;
+    int goal_y=ymax-1;
+    int obstacles[ymax][xmax]={0};
+    create_obstacle(obstacles);
+    display_obstacles(obstacles);//till here working
     //n[0].generate_node(0,0,1,1);
     for(int i=0;i<numNodes;i++)
-    {	//cout<<"nodes:"<<N_<<endl;
+    {	cout<<"nodes:"<<N_<<endl;
         int x_rand=rand()%xmax;//0 to xmax-1
         int y_rand=rand()%ymax;//0 to ymax-1
         
         int idx; 
-       float min_dist=std::numeric_limits<float>::max();
+        float min_dist=std::numeric_limits<float>::max();
         int global_count=0;//for ndist
         //skipped that  for
         
         float ndist[numNodes]={0};
-        
         for(int j=0;j<N_;j++)
         {
             float tmp=dist(n[j].x_cord,n[j].y_cord,x_rand,y_rand);
@@ -253,7 +248,6 @@ int main()
                 idx = j;
             }
         }
-     
         //cout<<" value"<<val<<" idx"<<idx<<endl;
         
         //n[idx]----> q_near
@@ -261,7 +255,7 @@ int main()
         int qnew_x,qnew_y,qnew_parent;
         float qnew_cost;
         steer(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,min_dist,EPS,&qnew_x,&qnew_y);
-        if (no_collision(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,MAP))//To defined
+        if (no_collision(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,obstacles))//To defined
         {
         //line drawn between qnear and qnew_y-dotted
         qnew_cost=dist(qnew_x,qnew_y,n[idx].x_cord,n[idx].y_cord)+n[idx].cost;
@@ -270,7 +264,7 @@ int main()
         int neighbour_count=0;
         for(int j=0;j<N_;j++)
         {
-            if(no_collision(n[j].x_cord,n[j].y_cord,qnew_x,qnew_y,MAP) && dist(n[j].x_cord,n[j].y_cord,qnew_x,qnew_y)<=r)
+            if(no_collision(n[j].x_cord,n[j].y_cord,qnew_x,qnew_y,obstacles) && dist(n[j].x_cord,n[j].y_cord,qnew_x,qnew_y)<=r)
             {
                 q_nearest[neighbour_count][0]=n[j].x_cord;
                  q_nearest[neighbour_count][1]=n[j].y_cord;
@@ -287,7 +281,7 @@ int main()
         
         for(int k=0;k<neighbour_count;k++)
         {
-            if(no_collision(q_nearest[k][0],q_nearest[k][1],qnew_x,qnew_y,MAP)&&(q_nearest[k][2]+dist(q_nearest[k][0],q_nearest[k][1],qnew_x,qnew_y)<cmin))
+            if(no_collision(q_nearest[k][0],q_nearest[k][1],qnew_x,qnew_y,obstacles)&&(q_nearest[k][2]+dist(q_nearest[k][0],q_nearest[k][1],qnew_x,qnew_y)<cmin))
             {
                 qminx=q_nearest[k][0];
                 qminy=q_nearest[k][1];
@@ -345,9 +339,8 @@ int main()
     while(1)
     {
         int start=q_end;
-     	cout<<"\n";
-        //bline(n[q_end].x_cord,n[q_end].y_cord,n[n[q_end].parent].x_cord,n[n[q_end].parent].y_cord,obstacles);
-        cv::line(imgout, cv::Point(n[q_end].x_cord,n[q_end].y_cord),cv::Point(n[n[q_end].parent].x_cord,n[n[q_end].parent].y_cord),cv::Scalar(255,0,0),3,cv::LINE_8);
+     
+        line(n[q_end].x_cord,n[q_end].y_cord,n[n[q_end].parent].x_cord,n[n[q_end].parent].y_cord,obstacles);
         //draw line btw 2 Nodes=q_endparent && qend
        
         q_end=n[q_end].parent;
@@ -355,12 +348,6 @@ int main()
         if (q_end==0)
         break;
     }
-    //display_obstacles(obstacles);
-    cv::imshow("Display path", imgout);
-     int m = cv::waitKey(0); // Wait for a keystroke in the window
-    if(m == 'q')
-    {
-        cv::destroyAllWindows();
-    }
+    display_obstacles(obstacles);
 }
 

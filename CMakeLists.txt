@@ -52,8 +52,8 @@ ${OpenCV_LIBS}
 
 # Build examples
 
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 add_executable(RRT_Star_Test_run
 src/RRT_star_new.cpp)
 target_link_libraries(RRT_Star_Test_run ${PROJECT_NAME})
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
