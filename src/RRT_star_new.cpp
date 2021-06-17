@@ -7,14 +7,15 @@
 #include <bits/stdc++.h>
 #include <limits>
 #include <opencv2/opencv.hpp>
+#define numNodes 10000
 #define xmax 1000
 #define ymax 1000
 
 using namespace std;
 
-int EPS=20,numNodes=10000;
+float EPS=20;
 int lamb=3.5;
-float r=50;//radius
+float r=60;//radius
 int N_=0;
 class Node
 {
@@ -81,18 +82,22 @@ float dist(int x1,int y1,int x2,int y2)
     return sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
 }
 
-void steer(int xr,int yr,int xn,int yn,float val,int EPS,int * new_x,int * new_y)
+void steer(int xr,int yr,int xn,int yn,float val,float EPS,int * new_x,int * new_y)
 {
-   /* if(val>=EPS)
-    {
-        *new_x=int(xn+float((xr-xn)*EPS/dist(xr,yr,xn,yn)));
-                *new_y=int(yn+float((yr-yn)*EPS/dist(xr,yr,xn,yn)));
+    if(val>=EPS)
+    {	int f1,f2;
+   
+  
+    f1=int(EPS*(xr-xn)/val);
+    f2=int(EPS*(yr-yn)/val);
+        *new_x=f1+xn;
+                *new_y=yn+f2;
     }
     else
-    {*/
+    {
                 *new_x=xr;
                         *new_y=yr;
-    //}
+    }
 }
 void swap(int * a,int * b)
 {
@@ -125,7 +130,7 @@ for(int x=x0;x<=x1;x++)
 	
 	{
 //	cout<<MAP.at<int>(x,y)<<endl;
-	if(MAP.at<int>(x,y)>128)//i made 
+	if(MAP.at<uint8_t>(x,y)<128)//i made 
 	
 	
 		return 0;}
@@ -133,7 +138,7 @@ else
 	{
 
 //        cout<<MAP.at<int>(x,y)<<endl;
-        if(MAP.at<int>(y,x)>128)//i made
+        if(MAP.at<uint8_t>(y,x)<128)//i made
         
 		return 0;}
 err-=dErr;
@@ -210,11 +215,11 @@ int main()
     cv::Mat MAP;
     MAP.create(1000,1000, CV_8UC1);
     cv::threshold(img, MAP, 0, 255, cv::THRESH_OTSU);
-    for(int i = 0; i < 1000; i++){
-        for(int j = 0; j < 1000; j++){
-            cout << imgout.at<int>(i,j);
-        }cout << endl;
-    }
+    //for(int i = 0; i < 1000; i++){
+    //    for(int j = 0; j < 1000; j++){
+    //       // cout << imgout.at<int>(i,j);
+    //    }cout << endl;
+    //}
     //cv::imshow("Display window2", imgout);
     // k = cv::waitKey(0); // Wait for a keystroke in the window
     //if(k == 'q')
@@ -226,12 +231,12 @@ int main()
     n[0].generate_node(200,200,INT_MAX,0);//x,y,parent,cost
     N_++;
     int goal_x=800;
-    int goal_y=200;
+    int goal_y=600;
     //int obstacles[ymax][xmax]={0};
    // create_obstacle(obstacles);
     //display_obstacles(obstacles);//till here working
     //n[0].generate_node(0,0,1,1);
-    for(int i=0;i<numNodes;i++)
+    for(long i=0;i<numNodes;i++)
     {	//cout<<"nodes:"<<N_<<endl;
         int x_rand=rand()%xmax;//0 to xmax-1
         int y_rand=rand()%ymax;//0 to ymax-1
@@ -261,7 +266,7 @@ int main()
         int qnew_x,qnew_y,qnew_parent;
         float qnew_cost;
         steer(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,min_dist,EPS,&qnew_x,&qnew_y);
-        if (no_collision(x_rand,y_rand,n[idx].x_cord,n[idx].y_cord,MAP))//To defined
+        if (no_collision(qnew_x,qnew_y,n[idx].x_cord,n[idx].y_cord,MAP))//To defined
         {
         //line drawn between qnear and qnew_y-dotted
         qnew_cost=dist(qnew_x,qnew_y,n[idx].x_cord,n[idx].y_cord)+n[idx].cost;
@@ -309,7 +314,7 @@ int main()
         }
         n[i].generate_node(qnew_x,qnew_y,qnew_parent,cmin);//cmin??
         N_++;
-        if (dist(qnew_x,qnew_y,goal_x,goal_y)<10)
+        if (dist(qnew_x,qnew_y,goal_x,goal_y)<EPS)
         {
             break;
         }
