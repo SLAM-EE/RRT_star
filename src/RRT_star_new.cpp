@@ -13,7 +13,7 @@
 
 using namespace std;
 
-float EPS=20;
+float EPS=40;
 int lamb=3.5;
 float r=60;//radius
 int N_=0;
@@ -88,8 +88,8 @@ void steer(int xr,int yr,int xn,int yn,float val,float EPS,int * new_x,int * new
     {	int f1,f2;
    
   
-    f1=int(EPS*(xr-xn)/val);
-    f2=int(EPS*(yr-yn)/val);
+    f1=int(50*(xr-xn)/val);
+    f2=int(50*(yr-yn)/val);
         *new_x=f1+xn;
                 *new_y=yn+f2;
     }
