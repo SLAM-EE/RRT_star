@@ -43,7 +43,7 @@ ${PROJECT_SOURCE_DIR}/include
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 
 add_library(${PROJECT_NAME} SHARED
-src/RRT_star_new.cpp
+    src/test.cc
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -57,3 +57,7 @@ add_executable(RRT_Star_Test_run
 src/RRT_star_new.cpp)
 target_link_libraries(RRT_Star_Test_run ${PROJECT_NAME})
 
+
+add_executable(simple_RRT
+src/RRT_simple.cpp)
+target_link_libraries(simple_RRT ${PROJECT_NAME})
