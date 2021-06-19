@@ -232,7 +232,8 @@ class  RRT{
 
 };
 
-
+ 
+/*---- main method for simple RRT ---*/
 int main(){
     RRT rrt = RRT(cv::Point2i(100, 100), cv::Point2i(800, 800));
     rrt.set_MAP("../img/map_basic.png");
@@ -241,3 +242,4 @@ int main(){
     std::cout << "Execution complete" << std::endl;
     return 0;
 }
+
