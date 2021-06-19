@@ -60,7 +60,7 @@ namespace Planning{
     
             std::vector<RRT_Node *> node_list;
     
-            RRT(cv::Point2i start, cv::Point2i goal, int expand_dist=30,
+            RRT(cv::Point2i start, cv::Point2i goal, int expand_dist=100,
                     int goal_sample_rate=5, int max_iter=1000,
                     float path_resolution=25.0)
                 :start(RRT_Node(start)), end(RRT_Node(goal)), expand_dist(expand_dist),
@@ -136,12 +136,18 @@ namespace Planning{
                 new_node->path.push_back(to_node->loc);
                 new_node->parent = from_node;
                 */
+                //if((rand()%100 > 40)){
+                //    dist = expand_dist * ((float)(rand()%100))/100.0;
+                //    theta = std::atan2(diff.y, diff.x);
+                //    new_node->loc.x = from_node->loc.x + (int)std::floor(dist * std::cos(theta));
+                //    new_node->loc.y = from_node->loc.y + (int)std::floor(dist * std::sin(theta));
+                //}
                 if(dist > expand_dist){
                     dist = expand_dist;
                     theta = std::atan2(diff.y, diff.x);
                     new_node->loc.x += (int)std::floor(dist * std::cos(theta));
                     new_node->loc.y += (int)std::floor(dist * std::sin(theta));
-                }
+                }else{new_node->loc = to_node->loc;}
                 new_node->parent = from_node;
     
                 //std::cout<<"x: "<<new_node->loc.x << " y: " << new_node->loc.y<<"\n";
