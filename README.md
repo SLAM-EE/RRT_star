@@ -17,10 +17,20 @@ This repository contains a C++ port of [RRT_Star from Python Robotics](https://p
 ``` 
 git clone https://github.com/SLAM-EE/RRT_star.git
     mkdir build 
+    mkdir spline/build
+    cd spline/build
+    cmake ..
+    make all
     cd build 
     cmake ..
     make all
     ./RRT_Star
+```
+
+Alternatively run the build script given as 
+
+```git clone https://github.com/SLAM-EE/RRT_star.git
+ build.sh
 ```
 
 ## Requirements
