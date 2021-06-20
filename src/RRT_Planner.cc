@@ -8,6 +8,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #include "../spline/include/Bezier.h"
+#include "../spline/include/BSpline.h"
 
 using namespace Planning;
 
@@ -155,7 +156,7 @@ class RRTStar : public RRT{
         return cv::Point(node.x, node.y);}
 
         void get_bezier_path(std::vector<cv::Point> path){
-            Curve* curve = new Bezier();
+            Curve* curve = new BSpline();
             curve->set_steps(100);
             for(auto point: path){
                 curve->add_way_point(Vector(point.x, point.y, 0));
