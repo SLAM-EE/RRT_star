@@ -160,9 +160,10 @@ class RRTStar : public RRT{
             for(auto point: path){
                 curve->add_way_point(Vector(point.x, point.y, 0));
             }
-            for(int i = 1; i < curve->node_count() ; ++i)
+            col_i++;
+            for(int i = 0; i < curve->node_count()-1 ; ++i)
                 cv::line(imout, getPoint(curve->node(i)),
-                    getPoint(curve->node(i+1)), colors[(++col_i) %5]);
+                    getPoint(curve->node(i+1)), colors[col_i % 5], 2);
             delete curve;
 
         }
@@ -193,7 +194,7 @@ class RRTStar : public RRT{
 
                         auto final_path = generate_final_course(safe_goal);
                         cv::polylines(imout, final_path, false,
-                                 colors[(++col_i)%5], 2, cv::LINE_8);
+                                 colors[(++col_i)%5], 1, cv::LINE_8);
                         get_bezier_path(final_path);
                         cv::imshow("final_path", imout);
                         cv::waitKey(20);
