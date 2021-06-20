@@ -7,7 +7,7 @@ This repository contains a C++ port of [RRT_Star from Python Robotics](https://p
 - Using a more gradual roll of function for the neghbour hood distance 
 
 
-  ![old_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\_radius&space;=&space;original\_radius&space;*&space;\sqrt(\frac{\log(nnode)}{nnode})) vs ![new_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\_radius&space;=&space;original\_radius&space;*&space;(1&space;-&space;\frac{nnode}{max\_iter}))
+  ![old_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\_radius&space;=&space;original\\_radius&space;*&space;\sqrt(\frac{\log(nnode)}{nnode})) vs ![new_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\_radius&space;=&space;original\\_radius&space;*&space;(1&space;-&space;\frac{nnode}{max\\_iter}))
 
 # RRT Star in Action
 ![RRTStar.gif](img/RRTStart.gif)
