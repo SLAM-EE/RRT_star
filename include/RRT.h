@@ -49,6 +49,11 @@ namespace Planning{
          * MAP: binary occupancy GridMap cv:Mat(CV_8UC1) 
          */
         public:
+            const cv::Scalar colors[5] = {cv::Scalar(212, 66, 245),
+                cv::Scalar(66, 242, 245), cv::Scalar(66, 66, 245),
+                cv::Scalar(69, 245, 66), cv::Scalar(212, 32, 41)};
+
+            uint8_t col_i;
             RRT_Node start, end;
             int expand_dist, goal_sample_rate, max_iter, max_rand, min_rand=0;
             float path_resolution;
@@ -66,7 +71,7 @@ namespace Planning{
                 :start(RRT_Node(start)), end(RRT_Node(goal)), expand_dist(expand_dist),
                  goal_sample_rate(goal_sample_rate), max_iter(max_iter),
                  path_resolution(path_resolution){
-                     std::srand(time(NULL));} 
+                     std::srand(time(NULL)); col_i=0;} 
     
             void set_sim_params(int expand_dist=30, int goal_sample_rate=5,
                     int max_iter=1000){
