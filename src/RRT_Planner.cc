@@ -7,6 +7,7 @@
 #include <limits>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include "../spline/include/Bezier.h"
 
 using namespace Planning;
 
@@ -149,6 +150,22 @@ class RRTStar : public RRT{
             if(safe_goal->cost == min_cost) return safe_goal;
             return NULL;
         }
+
+        cv::Point getPoint(Vector node){
+        return cv::Point(node.x, node.y);}
+
+        void get_bezier_path(std::vector<cv::Point> path){
+            Curve* curve = new Bezier();
+            curve->set_steps(100);
+            for(auto point: path){
+                curve->add_way_point(Vector(point.x, point.y, 0));
+            }
+            for(int i = 1; i < curve->node_count() ; ++i)
+                cv::line(imout, getPoint(curve->node(i)),
+                    getPoint(curve->node(i+1)), colors[(++col_i) %5]);
+            delete curve;
+
+        }
         std::vector<cv::Point> planning(bool animation=true){
             std::vector<cv::Point> final_path;
             RRT_Node *rnd_node, *nearest_node, *new_node;
@@ -168,18 +185,16 @@ class RRTStar : public RRT{
                     }
                 }
                 if(new_node){
-                    static std::uint8_t col_i = 80;
                     static float min_cost=std::numeric_limits<float>::max();
                     auto safe_goal = get_best_goal_node();
                     if(safe_goal && safe_goal->cost < min_cost){
                         //if(check_collision(safe_goal, &goal_node)) continue;
                         min_cost = safe_goal->cost;
 
-                        col_i += (rand() % 100) + 25;
-                        col_i %= 200;
                         auto final_path = generate_final_course(safe_goal);
                         cv::polylines(imout, final_path, false,
-                                 cv::Scalar(0, 255, 0), 2, cv::LINE_8);
+                                 colors[(++col_i)%5], 2, cv::LINE_8);
+                        get_bezier_path(final_path);
                         cv::imshow("final_path", imout);
                         cv::waitKey(20);
                         
@@ -188,27 +203,6 @@ class RRTStar : public RRT{
                 if(animation){
                   show_animation();     
                 }
-                //    node_list.push_back(new_node);
-                //    if(show_animation){
-                //        //std::cout << "Iteration: " << iter << "\n";
-                //        cv::line(imout, nearest_node->loc, new_node->loc,
-                //                cv::Scalar(255, 0, 0), 1, cv::LINE_8);
-                //        cv::imshow("RRT in action", imout);
-                //        cv::waitKey(24);
-                //    }
-                //}
-                //auto diff = end.loc - new_node->loc;
-                //if(std::hypotf(diff.x, diff.y) < this->expand_dist){
-                //    final_node = steer(new_node, &end);
-                //    if(!check_collision(new_node, final_node)){
-                //       final_path = generate_final_course(final_node); 
-                //       cv::destroyAllWindows();
-                //       cv::polylines(imout, final_path, false,
-                //                cv::Scalar(0, 0, 0), 2, cv::LINE_8);
-                //       cv::imshow("final_path", imout);
-                //       cv::waitKey(0);
-                //       break;
-                //    }
                 if(iter % 500 ==0) std::cout << iter<<"\n";
             }
             auto safe_goal = get_best_goal_node();
