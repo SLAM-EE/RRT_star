@@ -1,0 +1,6 @@
+build/*
+lib/*
+spline/build/*
+spline/lib/*
+spline/tags
+tags

@@ -48,6 +48,7 @@ add_library(${PROJECT_NAME} SHARED
 
 target_link_libraries(${PROJECT_NAME}
 ${OpenCV_LIBS}
+${PROJECT_SOURCE_DIR}/spline/lib/libSPLINE.so
 )
 
 # Build examples
