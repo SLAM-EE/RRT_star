@@ -27,7 +27,7 @@ git clone https://github.com/SLAM-EE/RRT_star.git
 - ### OpenCV 
     - opencv version 4 is used in this project
     - You might have to probably built it from sources 
-    - A [build script](scripts/setup-opencv.sh) is provided in the scripts folder run the script as root. 
+    - A [build script](scripts/setup-opencv.sh) is provided in the scripts folder run the script as root. Verify the source download link if script fails.
     - Check installation using 
         ```
         sudo apt install pkg-config
