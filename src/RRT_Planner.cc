@@ -27,10 +27,10 @@ class RRTStar : public RRT{
         Node goal_node, start_node;
         double EPS;
         //std::vector<Node *> node_list;
-        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=125,
+        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=25,
 
-                int goal_sample_rate=5, int max_iter=5000,
-                float path_resolution=25.0,int neighbour_dist=250, double EPS=60.0)
+                int goal_sample_rate=5, int max_iter=50000,
+                float path_resolution=25.0,int neighbour_dist=40, double EPS=30.0)
             :RRT(start, goal, expand_dist,goal_sample_rate, max_iter,
                 path_resolution), neighbour_dist(neighbour_dist), 
                 goal_node(goal), start_node(start), EPS(EPS){} 
@@ -68,7 +68,9 @@ class RRTStar : public RRT{
                                 RRT_Node * new_node){
             RRT_Node *parent_node;
             float cost, min_cost=std::numeric_limits<float>::max();
-            if(near_nodes.empty()){std::cout <<"no near nodes--"; return NULL;}
+            if(near_nodes.empty()){
+                //std::cout <<"no near nodes--"; 
+                return NULL;}
             for(auto node: near_nodes){
                 //std::cout << node->loc << ". cost : " << cost <<"\n";
                 auto t_node = new RRT_Node(new_node->loc);
@@ -82,7 +84,7 @@ class RRTStar : public RRT{
                     }
                 }
             }
-            if(min_cost > (float)(2 * max_rand * max_rand)) return NULL;
+            if(min_cost > (float)(20 * max_rand_x * max_rand_y)) return NULL;
             //new_node = steer(parent_node, new_node);
             new_node->parent = parent_node;
             new_node->cost = min_cost;
@@ -201,6 +203,8 @@ class RRTStar : public RRT{
                                  colors[(++col_i)%5], 1, cv::LINE_8);
                         auto smoothened_path = get_bezier_path(final_path);
                         cv::polylines(imout, smoothened_path, false, colors[col_i % 5], 2);
+                        std::cout << "New path found at iter: " << iter << " [Node count "
+                            << node_list.size() << " cost : " << min_cost << " ] \n";
                         cv::imshow("final_path", imout);
                         cv::waitKey(20);
                         
@@ -208,8 +212,9 @@ class RRTStar : public RRT{
                 }
                 if(animation){
                   show_animation();     
+                    //if(iter % 500 ==0) std::cout << "Iteration : " << iter << 
+                     //               " Node count : " << node_list.size() <<"\n";
                 }
-                if(iter % 500 ==0) std::cout << iter<<"\n";
             }
             auto safe_goal = get_best_goal_node();
             if(safe_goal){
@@ -222,6 +227,9 @@ class RRTStar : public RRT{
                 cv::imwrite("img/out.png", imout);
                 cv::waitKey(0);
                 
+            }else{
+                std::cout << "No path found between " << start_node.loc  
+                    << " and " << goal_node.loc << "\n";
             }
             return final_path;
         }
@@ -232,11 +240,14 @@ class RRTStar : public RRT{
  
 /*---- main method for simple RRT ---*/
 int main(){
-    RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 900));
+    RRTStar rrt = RRTStar(cv::Point2i(480, 270), cv::Point2i(602, 174)); //result
+    //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 900));
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
-    rrt.set_MAP("../img/map_basic.png");
+    //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
+    rrt.set_MAP("../img/map_slam.jpg");
+    //rrt.set_MAP("../img/map_basic.png");
     //rrt.set_MAP("../img/map_s.png");
-    rrt.add_map_padding(20);
+    //rrt.add_map_padding(20);
     rrt.display_MAP(500);
     auto path = rrt.planning(true);
     std::cout << "Execution complete" << std::endl;
