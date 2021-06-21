@@ -2,7 +2,7 @@
 
 This repository contains a C++ port of [RRT_Star from Python Robotics](https://pythonrobotics.readthedocs.io/en/latest/modules/path_planning.html), modified to meet our requirements. With the major differences being. 
 - Use of cv:Mat to store MAP and display path
-- Ability to load any MAP image and use it for path planning (right now it supports only square images)
+- Ability to load any MAP image and use it for path planning
 - Usage of LineDrawing algorithm to check for obstacles. This helps us detect even obstacles which are a single grid cell thick, as opposed to the more common sampling based approaches. Also the line drawing algorithm uses ineteger arithmetic which beats the runtime when using floating point sampling with half grid resolution. The code uses integers wherever possible to reduce runtime.
 - Using a more gradual roll of function for the neghbour hood distance 
 

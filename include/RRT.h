@@ -58,7 +58,7 @@ namespace Planning{
 
             uint8_t col_i;
             RRT_Node start, end;
-            int expand_dist, goal_sample_rate, max_iter, max_rand, min_rand=0;
+            int expand_dist, goal_sample_rate, max_iter, max_rand_x, max_rand_y, min_rand=0;
             float path_resolution;
     
     
@@ -89,7 +89,9 @@ namespace Planning{
                 cv::cvtColor(imout, gray, cv::COLOR_BGR2GRAY);
                 MAP.create(imout.rows, imout.cols, CV_8UC1);
                 cv::threshold(gray, MAP, 0, 255, cv::THRESH_OTSU); 
-                this->max_rand = MAP.rows;
+                this->max_rand_y = MAP.rows;
+                this->max_rand_x = MAP.cols;
+                std::cout << " MAP set with size " << MAP.size << std::endl;
             }
             
             void add_map_padding(int width){
@@ -118,8 +120,8 @@ namespace Planning{
             RRT_Node * get_random_node(){
                 RRT_Node *rnd;
                 if(std::rand() % 100 > goal_sample_rate)
-                    rnd = new RRT_Node(std::rand() % max_rand,
-                            std::rand() % max_rand);
+                    rnd = new RRT_Node(std::rand() % max_rand_x,
+                            std::rand() % max_rand_y);
                 else
                     rnd = new RRT_Node(end);
                 //std::cout<<"x: "<<rnd->loc.x << " y: " << rnd->loc.y<<"\n";
