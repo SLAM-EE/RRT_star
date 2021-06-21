@@ -48,10 +48,13 @@ namespace Planning{
          * end: goal location RRT_Node
          * MAP: binary occupancy GridMap cv:Mat(CV_8UC1) 
          */
+        private:
+            const cv::Scalar padding_col = cv::Scalar(255, 204, 204);
         public:
             const cv::Scalar colors[5] = {cv::Scalar(212, 66, 245),
                 cv::Scalar(66, 242, 245), cv::Scalar(66, 66, 245),
                 cv::Scalar(69, 245, 66), cv::Scalar(212, 32, 41)};
+            const cv::Scalar line_col = cv::Scalar(255, 0, 0);
 
             uint8_t col_i;
             RRT_Node start, end;
@@ -88,10 +91,27 @@ namespace Planning{
                 cv::threshold(gray, MAP, 0, 255, cv::THRESH_OTSU); 
                 this->max_rand = MAP.rows;
             }
+            
+            void add_map_padding(int width){
+
+                cv::Mat t_map = MAP.clone();
+                cv::Mat mask;
+
+                for(int i=0; i < width/5; i++){
+                    cv::GaussianBlur(MAP, MAP, cv::Size(21, 21), 5, 5);
+                    cv::threshold(MAP, MAP, 200, 255, cv::THRESH_BINARY);
+                }
+                cv::bitwise_not(MAP, mask);
+                cv::bitwise_and(mask, t_map, mask);
+                
+                //show the grown path in a different color
+                imout.setTo(padding_col, mask);
+
+            }
     
             void display_MAP(int delay_ms=0){
                 cv::imshow("Occupancy Grid Map", MAP);
-                int k = cv::waitKey(delay_ms);
+                cv::waitKey(delay_ms);
                 cv::destroyAllWindows();
             }
             
