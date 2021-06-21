@@ -7,6 +7,7 @@
 #include <limits>
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include "../spline/include/Bezier.h"
 #include "../spline/include/BSpline.h"
 
@@ -26,9 +27,9 @@ class RRTStar : public RRT{
         Node goal_node, start_node;
         double EPS;
         //std::vector<Node *> node_list;
-        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=40,
+        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=125,
 
-                int goal_sample_rate=5, int max_iter=50000,
+                int goal_sample_rate=5, int max_iter=5000,
                 float path_resolution=25.0,int neighbour_dist=250, double EPS=60.0)
             :RRT(start, goal, expand_dist,goal_sample_rate, max_iter,
                 path_resolution), neighbour_dist(neighbour_dist), 
@@ -123,7 +124,7 @@ class RRTStar : public RRT{
             for(auto node: node_list){
                 if(node->parent !=NULL){
                     cv::line(img, node->parent->loc, node->loc,
-                            cv::Scalar(255, 0, 0), 1, cv::LINE_8);
+                            line_col, 1, cv::LINE_8);
                 }
             }
             cv::imshow("RRT Star in action", img);
@@ -155,17 +156,19 @@ class RRTStar : public RRT{
         cv::Point getPoint(Vector node){
         return cv::Point(node.x, node.y);}
 
-        void get_bezier_path(std::vector<cv::Point> path){
+        std::vector<cv::Point>  get_bezier_path(std::vector<cv::Point> path){
+            std::vector<cv::Point> smoothened_path;
             Curve* curve = new BSpline();
             curve->set_steps(100);
+            smoothened_path.push_back(end.loc);
             for(auto point: path){
                 curve->add_way_point(Vector(point.x, point.y, 0));
             }
-            col_i++;
-            for(int i = 0; i < curve->node_count()-1 ; ++i)
-                cv::line(imout, getPoint(curve->node(i)),
-                    getPoint(curve->node(i+1)), colors[col_i % 5], 2);
+            for(int i = 0; i < curve->node_count() ; ++i)
+                smoothened_path.push_back(getPoint(curve->node(i)));
             delete curve;
+            smoothened_path.push_back(start.loc);
+            return smoothened_path;
 
         }
         std::vector<cv::Point> planning(bool animation=true){
@@ -189,14 +192,15 @@ class RRTStar : public RRT{
                 if(new_node){
                     static float min_cost=std::numeric_limits<float>::max();
                     auto safe_goal = get_best_goal_node();
-                    if(safe_goal && safe_goal->cost < min_cost){
+                    if(safe_goal && safe_goal->cost + get_dist_to_goal(safe_goal) < min_cost){
                         //if(check_collision(safe_goal, &goal_node)) continue;
-                        min_cost = safe_goal->cost;
+                        min_cost = safe_goal->cost + get_dist_to_goal(safe_goal);
 
                         auto final_path = generate_final_course(safe_goal);
                         cv::polylines(imout, final_path, false,
                                  colors[(++col_i)%5], 1, cv::LINE_8);
-                        get_bezier_path(final_path);
+                        auto smoothened_path = get_bezier_path(final_path);
+                        cv::polylines(imout, smoothened_path, false, colors[col_i % 5], 2);
                         cv::imshow("final_path", imout);
                         cv::waitKey(20);
                         
@@ -211,13 +215,9 @@ class RRTStar : public RRT{
             if(safe_goal){
                 auto final_path = generate_final_course(safe_goal);
                 cv::polylines(imout, final_path, false,
-                         cv::Scalar(0, 255, 0), 2, cv::LINE_8);
-                //for(auto node: node_list){
-                //    if(node->parent !=NULL){
-                //        cv::line(imout, node->parent->loc, node->loc,
-                //                cv::Scalar(255, 0, 0), 1, cv::LINE_8);
-                //    }
-                //}
+                         line_col, 1, cv::LINE_8);
+                auto smoothened_path = get_bezier_path(final_path);
+                cv::polylines(imout, smoothened_path, false, 0, 2);
                 cv::imshow("final_path", imout);
                 cv::imwrite("img/out.png", imout);
                 cv::waitKey(0);
@@ -236,6 +236,7 @@ int main(){
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
     rrt.set_MAP("../img/map_basic.png");
     //rrt.set_MAP("../img/map_s.png");
+    rrt.add_map_padding(20);
     rrt.display_MAP(500);
     auto path = rrt.planning(true);
     std::cout << "Execution complete" << std::endl;
