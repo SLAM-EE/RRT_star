@@ -95,6 +95,7 @@ namespace Planning{
                 std::cout << " MAP set with size " << MAP.size << std::endl;
                 show_goal_marker();
             }
+
             
             void add_map_padding(int width){
 

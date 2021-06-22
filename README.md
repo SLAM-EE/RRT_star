@@ -12,6 +12,11 @@ This repository contains a C++ port of [RRT_Star from Python Robotics](https://p
 # RRT Star in Action
 ![RRTStar.gif](img/RRTStart.gif)
 
+# RRT Star with smoothening on KITTI
+Map is obtained by using ORB SLAM 2
+![RRTStar.gif](img/res_slam_map1.gif)
+
+
 # Building and running
 
 ``` 
