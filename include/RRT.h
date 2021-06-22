@@ -50,6 +50,7 @@ namespace Planning{
          */
         private:
             const cv::Scalar padding_col = cv::Scalar(255, 204, 204);
+            const cv::Scalar marker_col = cv::Scalar(0, 255, 0);
         public:
             const cv::Scalar colors[5] = {cv::Scalar(212, 66, 245),
                 cv::Scalar(66, 242, 245), cv::Scalar(66, 66, 245),
@@ -92,6 +93,7 @@ namespace Planning{
                 this->max_rand_y = MAP.rows;
                 this->max_rand_x = MAP.cols;
                 std::cout << " MAP set with size " << MAP.size << std::endl;
+                show_goal_marker();
             }
             
             void add_map_padding(int width){
@@ -108,7 +110,13 @@ namespace Planning{
                 
                 //show the grown path in a different color
                 imout.setTo(padding_col, mask);
+                show_goal_marker();
 
+            }
+            
+            void show_goal_marker(){
+                cv::drawMarker(imout, start.loc, marker_col, cv::MARKER_TRIANGLE_UP, 10, 4);
+                cv::drawMarker(imout, end.loc, marker_col, cv::MARKER_CROSS, 10, 4);
             }
     
             void display_MAP(int delay_ms=0){
@@ -176,8 +184,14 @@ namespace Planning{
                     new_node->loc.y += (int)std::floor(dist * std::sin(theta));
                 }else{new_node->loc = to_node->loc;}
                 new_node->parent = from_node;
+                int x = new_node->loc.x; int y = new_node->loc.y;
+                if(x > MAP.cols || y > MAP.rows /*|| MAP.at<uint8_t>(x,y) < 0.8*/){
+                    std::cout << "new_node loc: " << new_node->loc << " map size" << MAP.size << "\n";
+
+                    return NULL;
+                }
+                //std::cout << (int)MAP.at<int>(x, y) ;
     
-                //std::cout<<"x: "<<new_node->loc.x << " y: " << new_node->loc.y<<"\n";
                 return new_node;
             }
     
@@ -238,6 +252,7 @@ namespace Planning{
                 node_list.push_back(&start);
                 for(int iter=0; iter<max_iter; ++iter){
                     rnd_node = get_random_node();
+                    if(rnd_node == NULL) continue;
                     nearest_node = get_nearest_node(rnd_node);
                     new_node = steer(nearest_node, rnd_node); 
                     if(!check_collision(nearest_node, new_node)){

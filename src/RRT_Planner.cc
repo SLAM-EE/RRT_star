@@ -182,6 +182,7 @@ class RRTStar : public RRT{
                 rnd_node = get_random_node();
                 nearest_node = get_nearest_node(rnd_node);
                 new_node = steer(nearest_node, rnd_node); 
+                if(new_node == NULL) continue;
                 if(!check_collision(nearest_node, new_node)){
                     near_nodes = find_near_nodes(new_node);
 
@@ -240,7 +241,7 @@ class RRTStar : public RRT{
  
 /*---- main method for simple RRT ---*/
 int main(){
-    RRTStar rrt = RRTStar(cv::Point2i(480, 270), cv::Point2i(602, 174)); //result
+    RRTStar rrt = RRTStar(cv::Point2i(480, 270), cv::Point2i(600, 178)); //result
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 900));
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
