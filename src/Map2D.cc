@@ -3,12 +3,15 @@
 
 #include "Map2D.h"
 #include <opencv2/core/hal/interface.h>
+#include <opencv2/core/saturate.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include <pangolin/pangolin.h>
+#include "matplotlibcpp.h"
 
 #include <mutex>
-
+namespace plt = matplotlibcpp;
 namespace ORB_SLAM2
 {
 
@@ -45,6 +48,7 @@ namespace ORB_SLAM2
 	    grid_map_thresh.create(h, w, CV_8UC1);
 	    grid_map_thresh_resized.create(h*resize_factor, w*resize_factor, CV_8UC1);
         grid_map_int = cv::Mat(h, w, CV_8SC1);
+        grid_map_display = cv::Mat(h, w, CV_8UC1);
 
 
 
@@ -62,7 +66,8 @@ namespace ORB_SLAM2
             resetGridMap();
             getGridMap();
             std::cout << "Map Processed" << endl;
-            
+              
+            //tDisp = new std::thread(std::this->display_map);
         }
     }
     void Map2D::inc_frame(){
@@ -148,7 +153,7 @@ namespace ORB_SLAM2
     }
 
     void Map2D::getGridMap() {
-    //directly taken from @abhineet github
+    //directly taken from @abhineet github/
 	for (int row = 0; row < h; ++row){
 		for (int col = 0; col < w; ++col){
 			int visits = global_visit_counter.at<int>(row, col);
@@ -173,34 +178,6 @@ namespace ORB_SLAM2
 		}
 	}
 	cv::resize(grid_map_thresh, grid_map_thresh_resized, grid_map_thresh_resized.size());
-   	//cv::imshow("grid_map_thresh_resized", grid_map_thresh_resized);
-    	//int key = cv::waitKey(1) % 256;
-    //std::cout << "image height:" << grid_map_thresh_resized.rows << std::endl;
-    //std::cout << "image width:" << grid_map_thresh_resized.cols << std::endl;
-   	//printf("saving maps with id: %u\n", frame_count);
-    cv::Mat mask = (grid_map < 0.48);
-    grid_map.setTo(0.48, mask);
-    cv::Mat mask2 = grid_map > 0.6;
-    grid_map.setTo(0.6, mask2);
-    float Amin = *min_element(grid_map.begin<float>(), grid_map.end<float>());
-    float Amax = *max_element(grid_map.begin<float>(), grid_map.end<float>());
-    cv::Mat display;
-    cv::Mat A_scaled = cv::Mat(h, w, CV_32FC1);
-    A_scaled = (grid_map - Amin) /(Amax - Amin);
-    //A_scaled = (grid_map - 0.48) /(0.6 - 0.48);
-    
-    //int nHistSize = 512;
-    //float fRange[] = { 0.0f, 1.0f };
-    //const float* fHistRange = { fRange };
-    //
-    //cv::Mat matHist;
-    //cv::calcHist(&A_scaled, 1, 0, cv::Mat(), matHist, 1, &nHistSize, &fHistRange);
-
-    //cv::imshow("histogram", matHist);
-    A_scaled.convertTo(display, CV_8UC1, 255.0, 0); 
-    cv::applyColorMap(display, display, cv::COLORMAP_JET);
-    cv::imshow("map 2D", display);
-    cv::imwrite("results/grid_map_" + to_string(frame_count) + ".jpg", grid_map_thresh);
     inc_frame();
 
 
@@ -208,6 +185,82 @@ namespace ORB_SLAM2
 
 
 }
+
+    void Map2D::display_map(){
+            
+    //cv::imshow("grid_map_thresh_resized", grid_map_thresh_resized);
+    	//int key = cv::waitKey(1) % 256;
+    //std::cout << "image height:" << grid_map_thresh_resized.rows << std::endl;
+    //std::cout << "image width:" << grid_map_thresh_resized.cols << std::endl;
+   	//printf("saving maps with id: %u\n", frame_count);
+    //cv::Mat mask = (grid_map < 0.48);
+    cv::Mat mask = (grid_map == 0.5);
+    //grid_map.setTo(0.48, mask);
+    //cv::Mat mask2 = grid_map > 0.6;
+    //grid_map.setTo(0.6, mask2);
+    float Amin = *min_element(grid_map.begin<float>(), grid_map.end<float>());
+    float Amax = *max_element(grid_map.begin<float>(), grid_map.end<float>());
+    cv::Mat display;
+    cv::Mat A_scaled = cv::Mat(h, w, CV_32FC1);
+    A_scaled = (grid_map - Amin) /(Amax - Amin);
+    //A_scaled = (grid_map - 0.48) /(0.6 - 0.48);
+    
+    int nHistSize = 512;
+    float fRange[] = { 0.0f, 1.0f };
+    const float* fHistRange = { fRange };
+    //
+    //cv::Mat matHist;
+    ////cv::calcHist(&A_scaled, 1, 0, cv::Mat(), matHist, 1, &nHistSize, &fHistRange);
+    //cv::calcHist(&grid_map, 1, 0, cv::Mat(), matHist, 1, &nHistSize, &fHistRange);
+    //std::vector<float> vecHist(matHist.begin<float>(), matHist.end<float>());
+
+    //plt::plot(vecHist);
+    //plt::show();
+    cv::Mat dst;
+    grid_map.convertTo(dst, CV_8UC1, 255.0, 0); 
+
+    vector<int> hist(256,0);
+    for (int r = 0; r < dst.rows; ++r) {
+        for (int c = 0; c < dst.cols; ++c) {
+            if (mask.at<int>(r, c)) {
+                hist[dst.at<uchar>(r, c)]++;
+            }
+        }
+    }
+
+
+    int cnz = countNonZero(mask);
+    float scale = 255.f / float(cnz);
+    vector<uchar> lut(256);
+    int sum = 0;
+    for (int i = 0; i < hist.size(); ++i) {
+        sum += hist[i];
+        lut[i] = cv::saturate_cast<uchar>(sum * scale);
+    }
+
+    //plt::plot(lut);
+    //plt::show();
+
+
+    unsigned char temp;
+    for (int r = 0; r < dst.rows; ++r) {
+        for (int c = 0; c < dst.cols; ++c) {
+            if (mask.at<int>(r, c)) {
+                //grid_map_display.at<uint>(r, c) = cv::saturate_cast<uchar>(lut[dst.at<uchar>(r,c)]);
+                dst.at<uint>(r, c) = cv::saturate_cast<uchar>(lut[dst.at<uchar>(r,c)]);
+                //cout << dst2.at<int>(r, c);
+                //cout << dst2.at<int>(r, c) ;
+                //cout << lut[dst.at<uchar>(r,c)];
+            }
+        }
+    }
+    //cv::equalizeHist(dst, dst);
+    cv::applyColorMap(dst, dst, cv::COLORMAP_JET);
+    //cv::imshow("map 2D", dst);
+    cv::imwrite("results/grid_map_" + to_string(frame_count) + ".jpg", dst);
+
+    }
+
 
 
     inline float Map2D::discretizeInX(float inp){

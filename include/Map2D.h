@@ -44,6 +44,7 @@ public:
 
     std::condition_variable cv;
     std::mutex mutexStart;
+    std::thread tDisp;
     Map2D(size_t scale, size_t grid_size);
     Map2D();
 
@@ -59,7 +60,7 @@ public:
     float free_thresh = 0.55;
     float occupied_thresh = 0.50;
     float thresh_diff = 0.01;
-    int visit_thresh = 0;
+    int visit_thresh = 4;
     float upper_left_x = -1.5;
     float upper_left_y = -2.5;
     const int resolution = 10;
@@ -69,7 +70,7 @@ public:
     cv::Mat global_occupied_counter, global_visit_counter;
     cv::Mat local_occupied_counter, local_visit_counter;
     cv::Mat local_map_pt_mask;
-    cv::Mat grid_map, grid_map_int, grid_map_thresh, grid_map_thresh_resized;
+    cv::Mat grid_map, grid_map_int, grid_map_thresh, grid_map_thresh_resized, grid_map_display;
     float norm_factor_x, norm_factor_z;
     int h, w;
     unsigned int n_kf_received;
@@ -85,6 +86,7 @@ public:
     void Run();
     void setNewKeyFrames(std::vector<ORB_SLAM2::KeyFrame*> keyFrames);
     void getGridMap();
+    void display_map();
 
 
 private:
