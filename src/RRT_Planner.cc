@@ -34,10 +34,10 @@ class RRTStar : public RRT{
         Node goal_node, start_node;
         double EPS;
         //std::vector<Node *> node_list;
-        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=30,
+        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=80,
 
                 int goal_sample_rate=5, int max_iter=50000,
-                float path_resolution=25.0,int neighbour_dist=80, double EPS=30.0)
+                float path_resolution=25.0,int neighbour_dist=150, double EPS=30.0)
             :RRT(start, goal, expand_dist,goal_sample_rate, max_iter,
                 path_resolution), neighbour_dist(neighbour_dist), 
                 goal_node(goal), start_node(start), EPS(EPS){
@@ -61,7 +61,7 @@ class RRTStar : public RRT{
             float mu_X_free = cv::countNonZero(coverage);
             gamma_rrt = std::sqrt(std::log(nnode)/nnode); 
             gamma_rrt_star = coeff * gamma_rrt * mu_X_free;
-            r = std::max(gamma_rrt_star, (float)(expand_dist));
+            r = std::min(gamma_rrt_star, (float)(expand_dist));
 #else
             float r1 = neighbour_dist * (1 - (nnode)/ max_iter);
             r = std::min(r1, (float)(expand_dist));
@@ -245,6 +245,7 @@ class RRTStar : public RRT{
                         cv::polylines(imout, smoothened_path, false, colors[col_i % 5], 2);
                         std::cout << "New path found at iter: " << iter << " [Node count "
                             << node_list.size() << " cost : " << min_cost << " ] \n";
+
                         cv::imshow("final_path", imout);
                         cv::waitKey(20);
                         
