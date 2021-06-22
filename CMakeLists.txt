@@ -10,6 +10,71 @@ MESSAGE("Build type: " ${CMAKE_BUILD_TYPE})
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}  -Wall -O0 -g  -march=native ")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -O0 -g -march=native")
 
+include(GNUInstallDirs)
+set(PACKAGE_NAME matplotlib_cpp)
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/${PACKAGE_NAME}/cmake)
+
+
+# Library target
+add_library(matplotlib_cpp INTERFACE)
+target_include_directories(matplotlib_cpp
+  INTERFACE
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/examples>
+    $<INSTALL_INTERFACE:include>
+)
+target_compile_features(matplotlib_cpp INTERFACE
+  cxx_std_11
+)
+# TODO: Use `Development.Embed` component when requiring cmake >= 3.18
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+target_link_libraries(matplotlib_cpp INTERFACE
+  Python3::Python
+  Python3::Module
+)
+find_package(Python3 COMPONENTS NumPy)
+if(Python3_NumPy_FOUND)
+  target_link_libraries(matplotlib_cpp INTERFACE
+    Python3::NumPy
+  )
+else()
+  target_compile_definitions(matplotlib_cpp INTERFACE WITHOUT_NUMPY)
+endif()
+install(
+  TARGETS matplotlib_cpp
+  EXPORT install_targets
+)
+
+
+
+# Install headers
+install(FILES
+  "${PROJECT_SOURCE_DIR}/matplotlibcpp.h"
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+
+# Install targets file
+install(EXPORT install_targets
+  FILE
+    ${PACKAGE_NAME}Targets.cmake
+  NAMESPACE
+    ${PACKAGE_NAME}::
+  DESTINATION
+    ${INSTALL_CONFIGDIR}
+)
+
+
+# Install matplotlib_cppConfig.cmake
+include(CMakePackageConfigHelpers)
+configure_package_config_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PACKAGE_NAME}Config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
+  INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
+  DESTINATION ${INSTALL_CONFIGDIR}
+)
+
 # Check C++11 or C++0x support
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -88,6 +153,7 @@ ${PROJECT_SOURCE_DIR}/Thirdparty/DBoW2/lib/libDBoW2.so
 ${Pangolin_LIBRARIES}
 ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 ${Boost_LIBRARIES}
+matplotlib_cpp
 )
 
 message(STATUS "Compile With map save/load function")
@@ -125,7 +191,7 @@ target_link_libraries(mono_tum ${PROJECT_NAME})
 
 add_executable(mono_kitti
 Examples/Monocular/mono_kitti.cc)
-target_link_libraries(mono_kitti ${PROJECT_NAME})
+target_link_libraries(mono_kitti ${PROJECT_NAME} matplotlib_cpp)
 
 add_executable(mono_euroc
 Examples/Monocular/mono_euroc.cc)

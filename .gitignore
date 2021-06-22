@@ -22,4 +22,4 @@ build/
 *~
 lib/
 tags
-
+results/*
