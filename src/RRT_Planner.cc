@@ -12,7 +12,8 @@
 #include "../spline/include/BSpline.h"
 
 using namespace Planning;
-
+#define USE_LEBESGUE_MEASURE true
+#define SHOW_ANIMATION true
 
 class Node : public RRT_Node{
     public:
@@ -22,29 +23,51 @@ class Node : public RRT_Node{
 };
 
 class RRTStar : public RRT{
+    private:
+        int iter;
+        #if USE_LEBESGUE_MEASURE
+            cv::Mat coverage;
+        #endif
+        
     public:
         int neighbour_dist;
         Node goal_node, start_node;
         double EPS;
         //std::vector<Node *> node_list;
-        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=25,
+        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=30,
 
                 int goal_sample_rate=5, int max_iter=50000,
-                float path_resolution=25.0,int neighbour_dist=40, double EPS=30.0)
+                float path_resolution=25.0,int neighbour_dist=80, double EPS=30.0)
             :RRT(start, goal, expand_dist,goal_sample_rate, max_iter,
                 path_resolution), neighbour_dist(neighbour_dist), 
-                goal_node(goal), start_node(start), EPS(EPS){} 
+                goal_node(goal), start_node(start), EPS(EPS){
+                } 
+        #if USE_LEBESGUE_MEASURE
+        void create_coverage_map(){
+            coverage = MAP.clone();    
+        }
+        #endif
 
         std::vector<RRT_Node *> find_near_nodes(RRT_Node *new_node){
             std::vector<RRT_Node *> near_nodes;
             float nnode = node_list.size();
-            float r,r1 = (std::rand() % (expand_dist>>1)) + 0.6 * expand_dist;
+            float r;
 
             //r1 = neighbour_dist * std::pow(2.8, -1 * nnode/(max_iter * 100));
-            r1 = neighbour_dist * (1 - (nnode)/ max_iter);
-            //r1 = neighbour_dist * std::sqrt(std::log(nnode+10)/nnode); 
-            //r = std::max(r1, (float)(expand_dist));
+            
+#if USE_LEBESGUE_MEASURE
+            const float coeff = 2.449489742783178; // 2 * (1 + 1/d)^(1/d) ; d=2;
+            float gamma_rrt, gamma_rrt_star;
+            float mu_X_free = cv::countNonZero(coverage);
+            gamma_rrt = std::sqrt(std::log(nnode)/nnode); 
+            gamma_rrt_star = coeff * gamma_rrt * mu_X_free;
+            r = std::max(gamma_rrt_star, (float)(expand_dist));
+#else
+            float r1 = neighbour_dist * (1 - (nnode)/ max_iter);
             r = std::min(r1, (float)(expand_dist));
+#endif
+
+            if(nnode < 3) r = neighbour_dist;
             //if(nnode > 200) r = std::min(r1, (float)(expand_dist));
             for(auto node: node_list){
                 auto diff = new_node->loc - node->loc;
@@ -121,8 +144,7 @@ class RRTStar : public RRT{
         }
         void show_animation(){
             cv::Mat img = imout.clone();
-            static int iter=0;
-            if(++iter % 100) return;
+            if(iter % 100) return;
             for(auto node: node_list){
                 if(node->parent !=NULL){
                     cv::line(img, node->parent->loc, node->loc,
@@ -158,6 +180,20 @@ class RRTStar : public RRT{
         cv::Point getPoint(Vector node){
         return cv::Point(node.x, node.y);}
 
+#if USE_LEBESGUE_MEASURE
+        void update_coverage(RRT_Node *center){
+            cv::circle(coverage, center->loc,
+                    (int)((center->cost - center->parent->cost)),
+                    0, cv::FILLED);
+    #if SHOW_ANIMATION
+                //if(iter % 100==0){
+                //    cv::imshow("coverage_map", coverage);
+                //    cv::waitKey(50);
+                //}
+    #endif
+        }
+#endif
+
         std::vector<cv::Point>  get_bezier_path(std::vector<cv::Point> path){
             std::vector<cv::Point> smoothened_path;
             Curve* curve = new BSpline();
@@ -178,7 +214,7 @@ class RRTStar : public RRT{
             RRT_Node *rnd_node, *nearest_node, *new_node;
             std::vector<RRT_Node *> near_nodes;
             node_list.push_back(&start_node);
-            for(int iter=0; iter<max_iter; ++iter){
+            for(iter=0; iter<max_iter; ++iter){
                 rnd_node = get_random_node();
                 nearest_node = get_nearest_node(rnd_node);
                 new_node = steer(nearest_node, rnd_node); 
@@ -190,6 +226,9 @@ class RRTStar : public RRT{
                     if(new_node){
                         node_list.push_back(new_node);
                         rewire(new_node, near_nodes);
+#if USE_LEBESGUE_MEASURE    
+                        update_coverage(new_node);
+#endif
                     }
                 }
                 if(new_node){
@@ -243,14 +282,17 @@ class RRTStar : public RRT{
 int main(){
     RRTStar rrt = RRTStar(cv::Point2i(480, 270), cv::Point2i(600, 178)); //result
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 900));
-    //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
+    //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 900));
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 400));
     rrt.set_MAP("../img/map_slam.jpg");
     //rrt.set_MAP("../img/map_basic.png");
     //rrt.set_MAP("../img/map_s.png");
     //rrt.add_map_padding(20);
+    #if USE_LEBESGUE_MEASURE
+    rrt.create_coverage_map();
+    #endif
     rrt.display_MAP(500);
-    auto path = rrt.planning(true);
+    auto path = rrt.planning(SHOW_ANIMATION);
     std::cout << "Execution complete" << std::endl;
     return 0;
 }
