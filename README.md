@@ -9,6 +9,13 @@ This repository contains a C++ port of [RRT_Star from Python Robotics](https://p
 
   ![old_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\_radius&space;=&space;original\\_radius&space;*&space;\sqrt(\frac{\log(nnode)}{nnode})) vs ![new_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\_radius&space;=&space;original\\_radius&space;*&space;(1&space;-&space;\frac{nnode}{max\\_iter}))
 
+
+- Ability to use lebesgue measure for Neighbour hood fall off with ```USE_LEBESGUE MEASURE`` option
+![gamma_rrt_star](https://latex.codecogs.com/svg.image?\gamma^{*}_{RRT}&space;=&space;2&space;*&space;(1&space;&plus;&space;1/d)^\frac{1}{d}&space;(\mu(\chi_{free})/\xi)^\frac{1}{d}&space;)
+
+![search_radius](https://latex.codecogs.com/svg.image?search\_radius&space;=&space;min\{\gamma^{*}_{RRT}&space;*&space;(log(n)/n)^\frac{1}{d},&space;expand\_dist\})
+ 
+
 # RRT Star in Action
 ![RRTStar.gif](img/RRTStart.gif)
 
