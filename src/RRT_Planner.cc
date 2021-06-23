@@ -34,10 +34,10 @@ class RRTStar : public RRT{
         Node goal_node, start_node;
         double EPS;
         //std::vector<Node *> node_list;
-        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=80,
+        RRTStar(cv::Point2i start, cv::Point2i goal, int expand_dist=40,
 
                 int goal_sample_rate=5, int max_iter=50000,
-                float path_resolution=25.0,int neighbour_dist=150, double EPS=30.0)
+                float path_resolution=25.0,int neighbour_dist=100, double EPS=30.0)
             :RRT(start, goal, expand_dist,goal_sample_rate, max_iter,
                 path_resolution), neighbour_dist(neighbour_dist), 
                 goal_node(goal), start_node(start), EPS(EPS){
@@ -209,13 +209,24 @@ class RRTStar : public RRT{
             return smoothened_path;
 
         }
+        void display_simulation_params(){
+            std::cout << "#............. Simulation parameters ........#\n";
+            std::cout << "max iterations : " << max_iter <<"\n";
+            std::cout << "expand distance : " << expand_dist <<"\n";
+            std::cout << "neighnour hood distance : " << neighbour_dist <<"\n";
+            std::cout << "MAP : " << MAP.type() << " size: " << MAP.size <<"\n";
+            std::cout << "sampling bounds : " << max_rand_x << " x " << max_rand_y <<"\n";
+        }
+
         std::vector<cv::Point> planning(bool animation=true){
+            display_simulation_params();
             std::vector<cv::Point> final_path;
             RRT_Node *rnd_node, *nearest_node, *new_node;
             std::vector<RRT_Node *> near_nodes;
             node_list.push_back(&start_node);
             for(iter=0; iter<max_iter; ++iter){
                 rnd_node = get_random_node();
+                if(rnd_node == NULL) continue;
                 nearest_node = get_nearest_node(rnd_node);
                 new_node = steer(nearest_node, rnd_node); 
                 if(new_node == NULL) continue;
