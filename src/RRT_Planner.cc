@@ -24,7 +24,6 @@ class Node : public RRT_Node{
 
 class RRTStar : public RRT{
     private:
-        int iter;
         #if USE_LEBESGUE_MEASURE
             cv::Mat coverage;
         #endif
@@ -216,6 +215,14 @@ class RRTStar : public RRT{
             std::cout << "neighnour hood distance : " << neighbour_dist <<"\n";
             std::cout << "MAP : " << MAP.type() << " size: " << MAP.size <<"\n";
             std::cout << "sampling bounds : " << max_rand_x << " x " << max_rand_y <<"\n";
+#if USE_LEBESGUE_MEASURE
+            std::cout << "Using Lebesgue Measure for rolling of neighbourhod\n";
+#endif
+#if SHOW_ANIMATION
+            std::cout<< "You can turn off animations by use SHOW_ANIMATION FLAG\n";
+#else
+            std::cout<< "To view all nodes generated use SHOW_ANIMATION FLAG\n";
+#endif
         }
 
         std::vector<cv::Point> planning(bool animation=true){
@@ -290,7 +297,7 @@ class RRTStar : public RRT{
 
 
  
-/*---- main method for simple RRT ---*/
+/*---- main method for simple RRT Star---*/
 int main(){
     RRTStar rrt = RRTStar(cv::Point2i(480, 270), cv::Point2i(600, 178)); //result
     //RRTStar rrt = RRTStar(cv::Point2i(100, 900), cv::Point2i(800, 900));
