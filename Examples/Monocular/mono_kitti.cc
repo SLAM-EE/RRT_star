@@ -70,6 +70,7 @@ int main(int argc, char **argv)
 
     // Main loop
     cv::Mat im;
+    int frame_gap =0;
     for(int ni=0; ni<nImages; ni++)
     {
         // Read image from file
@@ -112,7 +113,8 @@ int main(int argc, char **argv)
             usleep((T-ttrack)*1e6);
 
         //cout << ni << "frame number" << endl;
-        if(ni % 100 == 0 && ni >2){
+        if(++frame_gap > 100){
+            frame_gap = 0;
             mpMap2D.setNewKeyFrames(SLAM.getMap()->GetAllKeyFrames());
             mpMap2D.cv.notify_one();
         }

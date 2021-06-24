@@ -179,6 +179,9 @@ namespace ORB_SLAM2
 	}
 	cv::resize(grid_map_thresh, grid_map_thresh_resized, grid_map_thresh_resized.size());
     inc_frame();
+    cv::Mat dst;
+    grid_map.convertTo(dst, CV_8UC1, 255.0, 0); 
+    cv::imshow("map 2D", dst);
 
 
 
@@ -256,7 +259,6 @@ namespace ORB_SLAM2
     }
     //cv::equalizeHist(dst, dst);
     cv::applyColorMap(dst, dst, cv::COLORMAP_JET);
-    //cv::imshow("map 2D", dst);
     cv::imwrite("results/grid_map_" + to_string(frame_count) + ".jpg", dst);
 
     }
