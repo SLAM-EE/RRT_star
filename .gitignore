@@ -27,3 +27,6 @@ cmake/
 lib/
 tags
 results/*
+kitti_map_pts_out.obj
+kitti_map_pts_and_keyframes.txt
+kitti_key_frame_trajectory.txt
