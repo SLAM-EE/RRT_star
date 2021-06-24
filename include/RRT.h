@@ -6,6 +6,7 @@
 #ifndef RRT_H
 #define RRT_H
 
+#include <bits/stdint-uintn.h>
 #include <cmath>
 #include <complex>
 #include <cstdint>
@@ -52,6 +53,7 @@ namespace Planning{
             const cv::Scalar padding_col = cv::Scalar(255, 204, 204);
             const cv::Scalar marker_col = cv::Scalar(0, 255, 0);
         public:
+            int iter;
             const cv::Scalar colors[5] = {cv::Scalar(212, 66, 245),
                 cv::Scalar(66, 242, 245), cv::Scalar(66, 66, 245),
                 cv::Scalar(69, 245, 66), cv::Scalar(212, 32, 41)};
@@ -128,10 +130,10 @@ namespace Planning{
             
             RRT_Node * get_random_node(){
                 RRT_Node *rnd;
-                if(std::rand() % 100 > goal_sample_rate)
+                if(std::rand() % 100 > goal_sample_rate){
                     rnd = new RRT_Node(std::rand() % max_rand_x,
                             std::rand() % max_rand_y);
-                else
+                }else
                     rnd = new RRT_Node(end);
                 //std::cout<<"x: "<<rnd->loc.x << " y: " << rnd->loc.y<<"\n";
                 return rnd;
@@ -191,6 +193,7 @@ namespace Planning{
 
                     return NULL;
                 }
+                //std::cout << MAP.at<int>(x,y);
                 //std::cout << (int)MAP.at<int>(x, y) ;
     
                 return new_node;
@@ -201,8 +204,15 @@ namespace Planning{
                 int x0 = from_node->loc.x; int y0 = from_node->loc.y;
                 int x1 = to_node->loc.x; int y1 = to_node->loc.y;
     
-    
+                // check wether the end node falls in obstacles to
+                // this will make the code a lot faster
                 //line drawing algorithm 
+                uint8_t *map = (uint8_t *)MAP.data;
+                //std::cout << map[MAP.step * y0 + x0] << "\t";
+                if(map[MAP.step * y0 + x0] < 200){ return true;}
+
+                
+
                 int steep=(abs(y1-y0)>abs(x1-x0))?1:0;
                 if (steep){ 
                     std::swap(x0, y0); std::swap(x1,y1);
