@@ -39,12 +39,13 @@ Map is obtained by using ORB SLAM 2
 
 ``` 
 git clone https://github.com/SLAM-EE/RRT_star.git
-    mkdir build 
     mkdir spline/build
     cd spline/build
     cmake ..
     make all
-    cd build 
+    cd ../../
+    mkdir build 
+    cd build
     cmake ..
     make all
     ./RRT_Star
