@@ -7,16 +7,16 @@ This repository contains a C++ port of [RRT_Star from Python Robotics](https://p
 - Using a more gradual roll of function for the neghbour hood distance 
 
 
-  ![old_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\_radius&space;=&space;original\\_radius&space;*&space;\sqrt(\frac{\log(nnode)}{nnode})) -old
+  ![old_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\\_radius&space;=&space;original\\\_radius&space;*&space;\sqrt(\frac{\log(nnode)}{nnode})) -old
   
   
-  ![new_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\_radius&space;=&space;original\\_radius&space;*&space;(1&space;-&space;\frac{nnode}{max\\_iter}))  -new
+  ![new_fx](https://latex.codecogs.com/svg.latex?\inline&space;search\\\_radius&space;=&space;original\\\_radius&space;*&space;(1&space;-&space;\frac{nnode}{max\\\_iter}))  -new
 
 - Ability to use lebesgue measure for Neighbour hood fall off with `USE_LEBESGUE MEASURE` option. It uses the following equations
 
   - ![gamma_rrt_star](https://latex.codecogs.com/svg.image?\gamma^{*}_{RRT}&space;=&space;2&space;*&space;(1&space;&plus;&space;1/d)^\frac{1}{d}&space;(\mu(\chi_{free})/\xi)^\frac{1}{d}&space;)
 
-  - ![search_radius](https://latex.codecogs.com/svg.image?search\\_radius&space;=&space;min(\gamma^{*}_{RRT}&space;*&space;(log(n)/n)^\frac{1}{d},&space;\eta))
+  - ![search_radius](https://latex.codecogs.com/svg.image?search\\\_radius&space;=&space;min(\gamma^{*}_{RRT}&space;*&space;(log(n)/n)^\frac{1}{d},&space;\eta))
  
  where
  ```
