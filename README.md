@@ -16,7 +16,7 @@ This repository contains a C++ port of [RRT_Star from Python Robotics](https://p
 
   - ![gamma_rrt_star](https://latex.codecogs.com/svg.image?\gamma^{*}_{RRT}&space;=&space;2&space;*&space;(1&space;&plus;&space;1/d)^\frac{1}{d}&space;(\mu(\chi_{free})/\xi)^\frac{1}{d}&space;)
 
-  - ![search_radius](https://latex.codecogs.com/svg.image?search\\\_radius&space;=&space;min(\gamma^{*}_{RRT}&space;*&space;(log(n)/n)^\frac{1}{d},&space;\eta))
+  - ![search_radius](https://latex.codecogs.com/svg.image?r_{search}&space;=&space;min(\gamma^{*}_{RRT}&space;*&space;(log(n)/n)^\frac{1}{d},&space;\eta))
  
  where
  ```
