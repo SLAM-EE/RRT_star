@@ -37,24 +37,25 @@ Map is obtained by using ORB SLAM 2
 
 # Building and running
 
-``` 
+``` bash
 git clone https://github.com/SLAM-EE/RRT_star.git
-    mkdir spline/build
-    cd spline/build
-    cmake ..
-    make all
-    cd ../../
-    mkdir build 
-    cd build
-    cmake ..
-    make all
-    ./RRT_Star
+mkdir spline/build
+cd spline/build
+cmake ..
+make all
+cd ../../
+mkdir build 
+cd build
+cmake ..
+make all
+./RRT_Star
 ```
 
 Alternatively run the build script given as 
 
-```git clone https://github.com/SLAM-EE/RRT_star.git
- build.sh
+```bash
+git clone https://github.com/SLAM-EE/RRT_star.git
+build.sh
 ```
 
 ## Requirements
@@ -63,12 +64,12 @@ Alternatively run the build script given as
     - You might have to probably built it from sources 
     - A [build script](scripts/setup-opencv.sh) is provided in the scripts folder run the script as root. Verify the source download link if script fails.
     - Check installation using 
-        ```
+        ```bash
         sudo apt install pkg-config
         pkg-config --cflags opencv4
         ```
     - To use with OpenCV 3, modify [CMakeLists.txt](CMakeLists.txt) file line 29- 35 as below.
-        ````
+        ````cmake
         find_package(OpenCV 3 QUIET)
         if(NOT OpenCV_FOUND)
             find_package(OpenCV 2.4.3 QUIET)
